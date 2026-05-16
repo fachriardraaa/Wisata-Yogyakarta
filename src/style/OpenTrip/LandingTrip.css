@@ -1,194 +1,202 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Poppins:wght@300;400;600&display=swap');
-
-.exclusive-landing {
-  background-color: #0a0a0a; /* Hitam lebih pekat */
+.landing-exclusive {
+  background-color: #0a0a0a; /* Base color gelap */
   color: #fff;
-  font-family: 'Poppins', sans-serif;
+  overflow-x: hidden;
+  padding-bottom: 100px;
 }
 
-/* Luxury Hero Section */
-.luxury-hero {
-  height: 100vh;
-  display: flex;
-  overflow: hidden;
-}
-
-.hero-visual-split {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  width: 100%;
-}
-
-.hero-text-side {
+/* Hero Section */
+.hero-landing {
+  height: 80vh;
+  background: linear-gradient(rgba(0,0,0,0.6), #0a0a0a), 
+              url('https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?q=80');
+  background-size: cover;
+  background-position: center;
   display: flex;
   align-items: center;
-  padding: 0 10%;
-  background: #0f0f0f;
+  justify-content: center;
+  text-align: center;
 }
 
-.gold-label {
+.hero-content-ex h1 {
+  font-size: 4rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 20px 0;
+}
+
+.hero-content-ex h1 span {
+  color: #c9a84c; /* Gold color */
+}
+
+.badge-exclusive {
   color: #c9a84c;
-  text-transform: uppercase;
-  letter-spacing: 6px;
-  font-size: 0.8rem;
+  letter-spacing: 3px;
   font-weight: 600;
-  margin-bottom: 20px;
-  display: block;
 }
 
-.hero-text-side h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: 5.5rem;
-  line-height: 0.9;
-  margin-bottom: 30px;
-}
-
-.serif-italic {
-  font-style: italic;
-  font-weight: 400;
-  color: #c9a84c;
-}
-
-.cta-luxury {
-  background: none;
-  border: 1px solid #c9a84c;
-  color: #c9a84c;
-  padding: 18px 40px;
-  font-size: 0.9rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: 0.4s;
-}
-
-.cta-luxury:hover {
+.btn-gold-action {
   background: #c9a84c;
-  color: #000;
+  border: none;
+  padding: 15px 40px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 20px;
 }
 
-/* Hero Image Side */
-.hero-image-side {
+/* Carousel Section */
+.trip-carousel-section {
+  padding-top: 50px;
+}
+
+.section-title-center {
+  text-align: center;
+  margin-bottom: 80px;
+}
+
+.carousel-container {
+  width: 100%;
+  perspective: 1000px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 600px;
+  position: relative;
+  overflow: visible;
+}
+
+.carousel-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 1400px;
+}
+
+/* Trip Card Landing */
+.trip-card-landing {
+  background: #16120f; /* Base card color */
+  width: 400px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(201, 168, 76, 0.1);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  will-change: transform, opacity;
+  transition: filter 0.5s ease-in-out; /* Transisi halus untuk efek blur */
+  cursor: pointer;
+  position: absolute; /* Dibutuhkan agar motion.div x: ... bekerja sempurna */
+}
+
+.card-media-wrapper {
+  height: 220px;
   position: relative;
 }
 
-.hero-image-side img {
+.card-media-wrapper img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.floating-info-card {
+.cat-badge-overlay {
   position: absolute;
-  bottom: 50px;
-  left: -50px;
-  background: #c9a84c;
-  padding: 25px 40px;
+  bottom: 15px;
+  left: 15px;
+  background: rgba(201, 168, 76, 0.9);
   color: #000;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.card-info-landing {
+  padding: 25px;
+}
+
+.card-info-landing h3 {
+  color: #fff;
+  margin-bottom: 15px;
+  font-size: 1.3rem;
+}
+
+.meta-grid-landing {
+  display: flex;
+  gap: 15px;
+  font-size: 0.85rem;
+  color: #a0a0a0;
+  margin-bottom: 20px;
+}
+
+.price-row-landing {
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 15px;
   display: flex;
   flex-direction: column;
 }
 
-/* Signature Showcase */
-.signature-showcase {
-  position: relative;
-  padding: 150px 10%;
+.price-label { font-size: 0.8rem; color: #a0a0a0; }
+.price-val { 
+  font-size: 1.5rem; 
+  font-weight: 800; 
+  color: #c9a84c; 
+}
+
+.amenities-minimal {
   display: flex;
-}
-
-.vertical-title {
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  font-size: 5rem;
-  font-weight: 700;
-  color: rgba(201, 168, 76, 0.05);
-  position: absolute;
-  left: 50px;
-  top: 150px;
-}
-
-.featured-big-card {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  align-items: center;
-  gap: 60px;
-}
-
-.img-container {
-  position: relative;
-  height: 500px;
-  overflow: hidden;
-  border-radius: 4px;
-}
-
-.img-container img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: 1.5s;
-}
-
-.featured-big-card:hover img {
-  transform: scale(1.1);
-}
-
-/* Luxury Grid */
-.luxury-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 50px;
-  padding: 0 10% 100px;
-}
-
-.luxury-item {
-  cursor: pointer;
-}
-
-.item-img {
-  position: relative;
-  height: 400px;
-  margin-bottom: 25px;
-  overflow: hidden;
-}
-
-.item-img img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.item-price {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  background: #000;
-  color: #c9a84c;
-  padding: 10px 20px;
-  font-weight: 600;
-}
-
-.cat-text {
-  color: #c9a84c;
+  gap: 10px;
+  margin-top: 15px;
   font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 2px;
+  color: #4ade80; /* Green for checkmarks */
 }
 
-.discover-link {
-  color: #fff;
-  text-decoration: none;
-  font-size: 0.8rem;
-  border-bottom: 1px solid #c9a84c;
-  padding-bottom: 5px;
+.btn-outline-gold {
+  background: transparent;
+  border: 1px solid #c9a84c;
+  color: #c9a84c;
+  padding: 12px 30px;
+  border-radius: 8px;
+  cursor: pointer;
   transition: 0.3s;
 }
 
-.discover-link:hover {
-  letter-spacing: 1px;
+.btn-outline-gold:hover {
+  background: #c9a84c;
+  color: #000;
 }
 
-@media (max-width: 1024px) {
-  .hero-visual-split { grid-template-columns: 1fr; }
-  .hero-image-side { display: none; }
-  .luxury-grid { grid-template-columns: 1fr; }
-  .featured-big-card { grid-template-columns: 1fr; }
+.view-all-wrapper {
+  text-align: center;
+  margin-top: 80px;
+}
+
+.btn-gold-action:hover {
+  box-shadow: 0 0 20px rgba(201, 168, 76, 0.4);
+  background-color: #d4b65f;
+}
+
+/* Transisi Halus pada Gambar */
+.card-media-wrapper {
+  overflow: hidden;
+  border-radius: 20px 20px 0 0;
+}
+
+.card-media-wrapper img {
+  transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Responsivitas */
+@media (max-width: 768px) {
+  .carousel-wrapper {
+    flex-direction: column;
+  }
+  .trip-card-landing {
+    width: 90%;
+  }
+  .position--1, .position-1 {
+    display: none; /* Sembunyikan sampingan di mobile */
+  }
+  .hero-content-ex h1 { font-size: 2.5rem; }
 }
