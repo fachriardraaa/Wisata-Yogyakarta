@@ -1,0 +1,200 @@
+/* ArtikelBudaya.css */
+
+/* Container Utama */
+.budaya-container {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+  background-color: #ffffff;
+}
+
+/* Tag Header Atas (Aksen Miring Kiri) */
+.budaya-header-tag {
+  background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+  display: inline-block;
+  padding: 10px 30px;
+  color: white;
+  font-weight: 800;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  clip-path: polygon(0 0, 90% 0, 100% 100%, 0% 100%);
+  margin-bottom: 40px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* List Wrapper */
+.budaya-list {
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+}
+
+/* Base Card Style (Skema Warna Gradasi Oranye RRQ) */
+.budaya-card-wrapper {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #f1a93c 0%, #f39c12 100%);
+  color: white;
+  position: relative;
+  overflow: visible;
+  min-height: 280px;
+  border-radius: 4px;
+}
+
+/* --- Layout Kanan: Teks Kiri, Gambar Kanan (Contoh: Kategori 1 & 3) --- */
+.layout-right {
+  clip-path: polygon(0 0, 60% 0, 63% 13px, 100% 13px, 100% 100%, 0 100%);
+  padding: 30px 350px 30px 40px;
+}
+.layout-right .budaya-image-section {
+  position: absolute;
+  right: 40px;
+  bottom: 0;
+  width: 300px;
+  height: 110%; /* Tinggi dilebihkan agar terkesan 3D memotong garis atas */
+  display: flex;
+  align-items: flex-end;
+}
+
+/* --- Layout Kiri: Gambar Kiri, Teks Kanan (Contoh: Kategori 2) --- */
+.layout-left {
+  clip-path: polygon(0 13px, 37% 13px, 40% 0, 100% 0, 100% 100%, 0 100%);
+  padding: 30px 40px 30px 350px;
+}
+.layout-left .budaya-image-section {
+  position: absolute;
+  left: 40px;
+  bottom: 0;
+  width: 300px;
+  height: 110%;
+  display: flex;
+  align-items: flex-end;
+}
+
+/* Komponen Gambar */
+.budaya-photo {
+  width: 100%;
+  height: auto;
+  max-height: 310px;
+  object-fit: cover;
+  z-index: 2;
+  /* Efek gradasi transparan halus di bagian bawah gambar */
+  mask-image: linear-gradient(to top, black 85%, transparent 100%);
+}
+
+/* Efek Ornamen Lingkaran Aksen Terpotong di Belakang Foto */
+.budaya-bg-shape {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  border: 15px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+/* Bagian Konten Teks */
+.budaya-content-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  z-index: 3;
+}
+
+.budaya-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 0;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+}
+
+.budaya-category {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff3e0;
+  margin: 2px 0 15px 0;
+  font-style: italic;
+}
+
+.budaya-excerpt {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #ffffff;
+  margin: 0 0 20px 0;
+  text-align: justify;
+}
+
+/* Grid Sosial Media */
+.budaya-social-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.budaya-social-item {
+  display: flex;
+  align-items: center;
+  color: white;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+
+.budaya-social-item:hover {
+  opacity: 0.8;
+}
+
+.budaya-icon {
+  margin-right: 6px;
+  font-size: 1.1rem;
+}
+
+/* --- Tampilan Responsif (Mobile & Tablet) --- */
+@media (max-width: 900px) {
+  .budaya-card-wrapper {
+    flex-direction: column;
+    padding: 30px 20px !important;
+    clip-path: none !important; /* Nonaktifkan clip-path agar layout kotak rapi di HP */
+    gap: 20px;
+  }
+
+  .layout-right .budaya-image-section,
+  .layout-left .budaya-image-section {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    max-width: 250px;
+    height: auto;
+    margin: 0 auto;
+  }
+
+  .budaya-photo {
+    mask-image: none;
+  }
+
+  .budaya-bg-shape {
+    display: none;
+  }
+
+  .budaya-title {
+    font-size: 2rem;
+    text-align: center;
+  }
+
+  .budaya-category {
+    text-align: center;
+  }
+
+  .budaya-social-links {
+    justify-content: center;
+  }
+}

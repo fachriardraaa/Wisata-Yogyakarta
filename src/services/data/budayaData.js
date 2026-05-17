@@ -180,3 +180,48 @@ export const sidebarKat = [
   { nama: "Kesenian",          ikon: "🎶" },
   { nama: "Arsitektur",        ikon: "🏯" },
 ];
+
+// Percobaan
+
+// budayaData.js
+export const budayaData = [
+  {
+    id: 1,
+    title: "Keraton Yogyakarta",
+    category: "Sejarah & Tradisi",
+    image: "https://images.unsplash.com/photo-1625736113824-7164b4198278?q=80&w=600&auto=format&fit=crop", // Ganti dengan file foto lokal Anda
+    excerpt: "Keraton Ngayogyakarta Hadiningrat merupakan istana resmi Kesultanan Ngayogyakarta Hadiningrat yang hingga kini masih berfungsi sebagai tempat tinggal sultan. Kompleks bangunan istana ini masih memegang teguh adat istiadat dan menjadi pusat poros imajiner spiritual Yogyakarta.",
+    socials: {
+      instagram: "keratonjogja",
+      youtube: "Kraton Jogja",
+      tiktok: "@kratonjogja_"
+    },
+    layoutLeft: false // Gambar di kanan, teks di kiri (Gaya BB & Lemon)
+  },
+  {
+    id: 2,
+    title: "Candi Prambanan",
+    category: "Arkeologi & Legenda",
+    image: "https://images.unsplash.com/photo-1604999333679-b86d54738315?q=80&w=600&auto=format&fit=crop", // Ganti dengan file foto lokal Anda
+    excerpt: "Menara megah yang menjadi bukti kejayaan arsitektur Hindu kuno di Nusantara. Kompleks candi ini mempersembahkan relief epik Ramayana yang terpahat indah pada dindingnya, serta kisah legenda Roro Jonggrang yang melekat kuat di benak masyarakat lokal maupun dunia.",
+    socials: {
+      instagram: "prambananpark",
+      youtube: "TWC Prambanan",
+      tiktok: "@candi.prambanan"
+    },
+    layoutLeft: true // Gambar di kiri, teks di kanan (Gaya Michelle & Bigmo)
+  },
+  {
+    id: 3,
+    title: "Gudeg Wijilan",
+    category: "Kuliner Warisan",
+    image: "https://images.unsplash.com/photo-1676300185292-e23bb3db50fa?q=80&w=600&auto=format&fit=crop", // Ganti dengan file foto lokal Anda
+    excerpt: "Mengeksplorasi rumpun budaya Jogja tidak lengkap tanpa mencicipi manis gurihnya Gudeg. Sentra Wijilan menjadi saksi bisu perkembangan kuliner tradisional ini dari masa ke masa, mempertahankan resep otentik menggunakan kendil tanah liat dan kayu bakar.",
+    socials: {
+      instagram: "gudegwijilan.id",
+      youtube: "Eksplor Rasa Jogja",
+      tiktok: "@kuliner.wijilan"
+    },
+    layoutLeft: false // Gambar di kanan, teks di kiri
+  }
+];
