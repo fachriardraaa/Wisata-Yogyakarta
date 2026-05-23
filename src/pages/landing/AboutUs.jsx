@@ -1,7 +1,8 @@
+// src/pages/landing/AboutUs.jsx
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 
-// IMPORT CSS TERBARU (LIGHT MODE BERSIH)
+// IMPORT CSS TERBARU
 import '../../style/home-style/about.css';
 
 const fadeInUp = {
@@ -54,13 +55,9 @@ function AboutUs() {
 
   return (
     <div className="about-root sans">
-      
-      {/* BANTALAN GELAP AGAR NAVBAR TETAP KELIATAN */}
-      <div className="navbar-bg-fix"></div>
-
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         
-        {/* HEADER ELEGAN (TEXT GELAP KEMBALI) */}
+        {/* HEADER ELEGAN */}
         <motion.div 
           className="text-center max-w-3xl mx-auto mb-20"
           initial="hidden"
@@ -68,15 +65,15 @@ function AboutUs() {
           variants={fadeInUp}
         >
           <div className="text-[#c9a452] uppercase tracking-[0.3em] text-xs mb-4 font-bold sans">Tentang Kami</div>
-          <h1 className="text-5xl md:text-6xl font-bold serif text-gray-900 mb-6 leading-tight">
+          <h1 className="text-5xl md:text-6xl font-bold serif text-white mb-6 leading-tight">
             Kreator di Balik <br /> <span className="text-[#b8963e]">Hiling Semata</span>
           </h1>
-          <p className="text-gray-500 sans leading-relaxed text-lg">
+          <p className="text-gray-300 sans leading-relaxed text-lg">
             Sinergi lima talenta yang berdedikasi melestarikan warisan Mataram melalui inovasi digital.
           </p>
         </motion.div>
 
-        {/* TEAM LIST (LIGHT MODE BERSIH) */}
+        {/* TEAM LIST */}
         <div className="rrq-inspired-list">
           {teamData.map((member, index) => (
             <motion.div 
@@ -87,7 +84,6 @@ function AboutUs() {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1, duration: 0.6 }}
             >
-              {/* TEKS DI KIRI */}
               <div className="rrq-card-text">
                 <div className="rrq-role-light sans font-bold">{member.posisi}</div>
                 <h3 className="rrq-name-light serif">{member.nama}</h3>
@@ -99,7 +95,6 @@ function AboutUs() {
                 </div>
               </div>
 
-              {/* FOTO KOTAK RAPI DI KANAN */}
               <div className="rrq-card-photo-wrapper">
                 <img src={member.foto} alt={member.nama} className="rrq-image-light" />
               </div>

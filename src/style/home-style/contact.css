@@ -1,79 +1,87 @@
 /* src/style/home-style/contact.css */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Lato:wght@300;400;700&display=swap');
-
-.serif { font-family: 'Cormorant Garamond', serif; }
-.sans { font-family: 'Lato', sans-serif; }
 
 .contact-root {
-  position: relative;
-  background-color: #2c2c2e;
+  /* POLA TITIK-TITIK HALUS SAMA SEPERTI ABOUT US */
+  background-color: #1a1a1a; 
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px);
+  background-size: 35px 35px; 
   min-height: 100vh;
-  overflow: hidden;
+  padding-top: 10rem; 
   padding-bottom: 6rem;
+  position: relative; 
 }
 
-/* Ornamen Titik-titik (Dot Pattern) khas Quera */
-.dot-pattern {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  opacity: 0.3;
-  background-image: radial-gradient(#c9a452 1px, transparent 1px);
-  background-size: 32px 32px;
+.contact-grid {
+  display: grid;
+  grid-cols-1: 1fr;
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
-/* Input Styling */
-.contact-input {
+@media (min-width: 768px) {
+  .contact-grid {
+    grid-template-columns: 4fr 6fr;
+  }
+}
+
+/* KARTU KIRI */
+.contact-info-card {
+  background-color: #ffffff;
+  border-radius: 1.5rem;
+  border: 1px solid #374151;
+  padding: 3rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+/* KARTU KANAN (FORM) */
+.contact-form-card {
+  background-color: #ffffff;
+  border-radius: 1.5rem;
+  border: 1px solid #374151;
+  padding: 3rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+/* STYLING FORM FIELD */
+.form-input-field {
   width: 100%;
-  background-color: white;
-  border: 1px solid #e5e7eb;
+  padding: 1rem;
   border-radius: 0.75rem;
-  padding: 0.75rem 1rem;
-  color: #374151;
-  font-family: 'Lato', sans-serif;
-  outline: none;
-  transition: all 0.3s ease;
-}
-
-.contact-input:focus {
-  border-color: #c9a452;
-  box-shadow: 0 0 15px rgba(201,164,82,0.15);
-  transform: translateY(-2px);
-}
-
-/* Info Card Styling */
-.info-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  padding: 1.5rem;
-  border-radius: 1rem;
-  background-color: white;
-  border: 1px solid #f3f4f6;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-}
-
-.info-card:hover {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  transform: translateY(-4px);
-}
-
-.icon-box {
-  width: 3rem;
-  height: 3rem;
-  border-radius: 9999px;
+  border: 1px solid #e5e7eb;
   background-color: #fcfaf7;
-  border: 1px solid #e2d5bc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #c9a452;
-  font-size: 1.25rem;
+  color: #111827;
+  font-size: 0.9rem;
   transition: all 0.3s ease;
 }
 
-.info-card:hover .icon-box {
+.form-input-field:focus {
+  outline: none;
+  border-color: #c9a452;
+  box-shadow: 0 0 10px rgba(201, 164, 82, 0.15);
+  background-color: #ffffff;
+}
+
+/* TOMBOL SUBMIT KUNING EMAS MENYALA */
+.btn-form-submit {
+  width: 100%;
+  background-color: #1a1207;
+  color: #ffffff;
+  font-weight: 700;
+  padding: 1.2rem;
+  border-radius: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 0.75rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.btn-form-submit:hover {
   background-color: #c9a452;
-  color: white;
+  color: #1a1207;
+  border-color: #c9a452;
+  /* Efek pendaran cahaya kuning-emas menyala */
+  box-shadow: 0 0 25px rgba(201, 164, 82, 0.4);
 }
