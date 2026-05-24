@@ -1,413 +1,293 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { dataArtikel } from "../../services/data/budayaData";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "../../style/budaya-style/ArtikelBudaya.css";
 
-const KATEGORI = [
-  "Semua",
-  "Batik",
-  "Wayang",
-  "Sejarah & Keraton",
-  "Kuliner",
-  "Tradisi & Upacara",
-  "Kesenian",
-  "Kerajinan",
-  "Seni Pertunjukan",
-  "Tari",
-];
-const TICKER = [
-  "Budaya Yogyakarta",
-  "Warisan Leluhur",
-  "Seni Tradisional",
-  "Kearifan Lokal",
-  "Batik & Kerajinan",
-  "Tari & Musik",
-  "Kuliner Khas",
-  "Sejarah Keraton",
-  "Open Trip Budaya",
-];
+// Import aset gambar lokal (menggunakan aset yang sudah ada agar konsisten)
+import heroBg from "../../assets/images/heroSection-budaya.png";
+import seniImg from "../../assets/images/seniPertunjukan-budaya.png";
+import keratonImg from "../../assets/images/keratonSejarah-budaya.png";
+import kearifanImg from "../../assets/images/kearifanLokal-budaya.png";
 
-function useScrollAnim() {
+const ArtikelBudaya = () => {
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedKategori, setSelectedKategori] = useState("Semua");
+
+  // Auto scroll ke atas saat halaman diakses
   useEffect(() => {
-    const els = document.querySelectorAll(".ab-anim");
-    const io = new IntersectionObserver(
-      (entries) =>
-        entries.forEach((e) => {
-          if (e.isIntersecting) e.target.classList.add("ab-show");
-        }),
-      { threshold: 0.1 },
-    );
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  });
-}
-
-function useProgress() {
-  const [p, setP] = useState(0);
-  useEffect(() => {
-    const fn = () => {
-      const d = document.documentElement;
-      setP(
-        d.scrollHeight - d.clientHeight > 0
-          ? (window.scrollY / (d.scrollHeight - d.clientHeight)) * 100
-          : 0,
-      );
-    };
-    window.addEventListener("scroll", fn, { passive: true });
-    return () => window.removeEventListener("scroll", fn);
-  }, []);
-  return p;
-}
-
-export default function ArtikelBudaya() {
-  const [aktif, setAktif] = useState("Semua");
-  const [search, setSearch] = useState("");
-  const progress = useProgress();
-  useScrollAnim();
-
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo(0, 0);
   }, []);
 
-  const filtered = dataArtikel.filter((a) => {
-    const kat = aktif === "Semua" || a.kategori === aktif;
-    const src =
-      a.judul.toLowerCase().includes(search.toLowerCase()) ||
-      a.ringkasan.toLowerCase().includes(search.toLowerCase());
-    return kat && src;
+  // Data Mock Artikel Budaya & Sejarah
+  const daftarArtikel = [
+    {
+      id: "art-1",
+      title:
+        "Menelisik Garis Imajiner Yogyakarta: Filosofi Poros Gaib Karang Mataram",
+      excerpt:
+        "Membentang lurus dari Gunung Merapi, Tugu Pal Putih, Keraton, hingga Laut Selatan. Bukan sekadar kebetulan geografis, melainkan sebuah konsep spiritual...",
+      kategori: "Sejarah",
+      tanggal: "18 Mei 2026",
+      penulis: "Raden Mas Pramono",
+      bacaan: "5 mnt baca",
+      image: keratonImg,
+      highlight: true,
+    },
+    {
+      id: "art-2",
+      title:
+        "Rahasia Dibalik Goresan Canting: Makna Simbolis Motif Batik Parang Rusak",
+      excerpt:
+        "Batik Parang Rusak dahulu hanya boleh dikenakan oleh keluarga kerajaan. Penasaran dengan jalinan doa dan ketegasan mental yang tersirat di setiap lengkungannya?",
+      kategori: "Kriya & Seni",
+      tanggal: "12 Mei 2026",
+      penulis: "Siti Utami",
+      bacaan: "4 mnt baca",
+      image: kearifanImg,
+      highlight: false,
+    },
+    {
+      id: "art-3",
+      title:
+        "Kolo Tjokro dan Modernitas: Bagaimana Wayang Kulit Bertahan di Era Digital",
+      excerpt:
+        "Seni pementasan bayangan kulit asli Mataram ini terus bersalin rupa. Menilik inovasi para dalang muda dalam meramu sound system modern tanpa merusak pakem klasik.",
+      kategori: "Seni Pertunjukan",
+      tanggal: "05 Mei 2026",
+      penulis: "Bagus Wijaya",
+      bacaan: "7 mnt baca",
+      image: seniImg,
+      highlight: false,
+    },
+    {
+      id: "art-4",
+      title:
+        "Ritual Sekaten: Perpaduan Syiar Islam dan Harmoni Akulturasi Budaya Jawa",
+      excerpt:
+        "Mendengarkan gemuruh alunan Gamelan Kyai Guntur Madu yang magis di halaman Masjid Gedhe Kauman, penanda perayaan hari lahir Nabi Muhammad SAW.",
+      kategori: "Upacara Adat",
+      tanggal: "28 April 2026",
+      penulis: "Ki Jatmiko",
+      bacaan: "6 mnt baca",
+      image: heroBg,
+      highlight: false,
+    },
+    {
+      id: "art-5",
+      title:
+        "Melestarikan Kuliner Ndalem: Riwayat Panjang Sayur Brongkos Kesukaan Sultan",
+      excerpt:
+        "Kuah hitam pekat berbahan dasar kluwek dibalut gurihnya santan dan kacang tholo. Kuliner otentik yang menyimpan sejarah diplomasi rasa di dalam benteng istana.",
+      kategori: "Kuliner",
+      tanggal: "20 April 2026",
+      penulis: "Nyi Warsito",
+      bacaan: "4 mnt baca",
+      image: kearifanImg,
+      highlight: false,
+    },
+  ];
+
+  const kategoriList = [
+    "Semua",
+    "Sejarah",
+    "Seni Pertunjukan",
+    "Kriya & Seni",
+    "Upacara Adat",
+    "Kuliner",
+  ];
+
+  // Filter Logika pencarian dan dropdown kategori
+  const artikelFilter = daftarArtikel.filter((artikel) => {
+    const matchSearch =
+      artikel.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      artikel.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchKategori =
+      selectedKategori === "Semua" || artikel.kategori === selectedKategori;
+    return matchSearch && matchKategori;
   });
 
-  const featured = filtered.find((a) => a.featured) || filtered[0];
-  const lainnya = filtered.filter((a) => a.id !== featured?.id);
-
-  // 3 artikel terbaru untuk preview kanan hero
-  const previewArtikel = dataArtikel.slice(0, 3);
+  // Ambil artikel utama (Highlight)
+  const artikelUtama = daftarArtikel.find((item) => item.highlight);
 
   return (
-    <div className="ab-root">
-      {/* Progress bar */}
-      <div className="ab-progress" style={{ width: `${progress}%` }} />
-
-      {/* ══════════════════════════════════════════
-          1. HERO — FULL FOTO + PREVIEW ARTIKEL
-      ══════════════════════════════════════════ */}
-      <section className="ab-hero">
-        {/* Background foto penuh */}
-        <div className="ab-hero-bg">
-          <img
-            src={dataArtikel[2]?.gambar || "../src/assets/images/keraton.png"}
-            alt="Artikel Budaya"
-            onError={(e) => {
-              e.target.src =
-                "https://placehold.co/1600x900/2d1f0a/c9a84c?text=Artikel+Budaya";
-            }}
-          />
+    <div className="artikel-budaya-container bg-[#fcf8f3] text-[#2c2115] min-h-screen font-sans pb-24">
+      {/* ========================================================================= */}
+      {/* 1. HEADER & ZONE PENCARIAN CONTROLLER                                      */}
+      {/* ========================================================================= */}
+      <section className="pt-32 pb-12 px-6 md:px-16 max-w-6xl mx-auto text-center">
+        <div className="flex items-center justify-center gap-2 mb-3">
+          <span className="w-6 h-[1px] bg-[#bfa37a]"></span>
+          <p className="text-[#bfa37a] tracking-widest text-xs uppercase font-bold">
+            Ruang Literasi
+          </p>
+          <span className="w-6 h-[1px] bg-[#bfa37a]"></span>
         </div>
+        <h1 className="text-4xl font-serif font-light text-[#3a2f21] mb-4">
+          Artikel &{" "}
+          <span className="text-[#c29646] italic font-normal">
+            Catatan Budaya
+          </span>
+        </h1>
+        <p className="text-gray-500 text-xs md:text-sm max-w-xl mx-auto font-light leading-relaxed mb-8">
+          Kumpulan esai, ulasan mendalam, dan catatan sejarah mengenai peradaban
+          tanah Mataram yang ditulis langsung oleh para pengamat budaya.
+        </p>
 
-        {/* Konten bawah */}
-        <div className="ab-hero-body">
-          {/* Kiri — judul & aksi */}
-          <div className="ab-hero-left">
-            <div className="ab-hero-eyebrow">Jurnal Budaya · Edisi 2025</div>
-            <h1 className="ab-hero-title">
-              Warisan yang
-              <br />
-              <span>Tak Pernah Mati</span>
-            </h1>
-            <div className="ab-hero-line" />
-            <p className="ab-hero-desc">
-              Setiap artikel adalah jendela menuju kekayaan budaya Yogyakarta.
-              Baca, pahami, dan jadikan warisan ini bagian dari hidupmu.
-            </p>
-            <div className="ab-hero-stats">
-              <div className="ab-hero-stat">
-                <div className="ab-hero-stat-num">{dataArtikel.length}</div>
-                <div className="ab-hero-stat-label">Artikel</div>
-              </div>
-              <div className="ab-hero-stat-div" />
-              <div className="ab-hero-stat">
-                <div className="ab-hero-stat-num">
-                  {[...new Set(dataArtikel.map((a) => a.kategori))].length}
-                </div>
-                <div className="ab-hero-stat-label">Kategori</div>
-              </div>
-              <div className="ab-hero-stat-div" />
-              <div className="ab-hero-stat">
-                <div className="ab-hero-stat-num">∞</div>
-                <div className="ab-hero-stat-label">Warisan</div>
-              </div>
-            </div>
-            <div className="ab-hero-btns">
-              <button
-                className="ab-btn-gold"
-                onClick={() =>
-                  document
-                    .querySelector(".ab-grid-wrap")
-                    ?.scrollIntoView({ behavior: "smooth" })
-                }
-              >
-                Mulai Membaca ↓
-              </button>
-              <Link to="/budaya" className="ab-btn-outline-white">
-                ← Semua Budaya
-              </Link>
-            </div>
+        {/* Filter Bar Intuitif */}
+        <div className="max-w-3xl mx-auto bg-white rounded-2xl p-3 border border-[#eedfc9]/60 shadow-sm flex flex-col md:flex-row items-center gap-3">
+          <div className="w-full md:flex-grow relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+              🔍
+            </span>
+            <input
+              type="text"
+              placeholder="Cari judul artikel atau topik kebudayaan..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 text-xs bg-[#fcf8f3]/50 focus:bg-white rounded-xl border border-transparent focus:border-[#eedfc9] outline-none text-[#2c2115] transition-all"
+            />
           </div>
-
-          {/* Kanan — 3 preview kartu artikel */}
-          <div className="ab-hero-right">
-            <p
-              style={{
-                fontFamily: "'Lato',sans-serif",
-                fontSize: "9px",
-                letterSpacing: ".3em",
-                color: "rgba(255,255,255,.3)",
-                textTransform: "uppercase",
-                marginBottom: "6px",
-              }}
+          <div className="w-full md:w-auto flex-shrink-0">
+            <select
+              value={selectedKategori}
+              onChange={(e) => setSelectedKategori(e.target.value)}
+              className="w-full md:w-auto bg-[#fcf8f3] border border-[#eedfc9]/60 text-xs text-[#534637] px-4 py-2.5 rounded-xl font-medium focus:outline-none focus:border-[#c29646]"
             >
-              Artikel Terbaru
-            </p>
-            {previewArtikel.map((a) => (
-              <Link
-                key={a.id}
-                to={`/budaya/${a.id}`}
-                className="ab-hero-preview-card"
-              >
-                <div className="ab-hero-preview-img">
-                  <img
-                    src={a.gambar}
-                    alt={a.judul}
-                    onError={(e) => {
-                      e.target.src = `https://placehold.co/100x100/2d1f0a/c9a84c?text=${a.kategori}`;
-                    }}
-                  />
-                </div>
-                <div>
-                  <div className="ab-hero-preview-kat">{a.kategori}</div>
-                  <div className="ab-hero-preview-title">{a.judul}</div>
-                  <div className="ab-hero-preview-menit">⏱ {a.menit}</div>
-                </div>
-              </Link>
-            ))}
+              {kategoriList.map((kat, index) => (
+                <option key={index} value={kat}>
+                  {kat}
+                </option>
+              ))}
+            </select>
           </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="ab-hero-scroll">
-          <div className="ab-hero-scroll-dot" />
-          <span className="ab-hero-scroll-text">Scroll</span>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════
-          2. TICKER
-      ══════════════════════════════════════════ */}
-      <div className="ab-ticker" aria-hidden="true">
-        <div className="ab-ticker-track">
-          {[...TICKER, ...TICKER].map((item, i) => (
-            <span key={i} className="ab-ticker-item">
-              {item}
-              <span className="ab-ticker-sep" />
-            </span>
-          ))}
-        </div>
-      </div>
+      {/* ========================================================================= */}
+      {/* 2. ARTIKEL UTAMA (FEATURED SPOTLIGHT BANNER)                              */}
+      {/* ========================================================================= */}
+      {artikelUtama && searchQuery === "" && selectedKategori === "Semua" && (
+        <section className="px-6 md:px-16 max-w-6xl mx-auto mb-16">
+          <div
+            onClick={() => navigate(`/artikel/${artikelUtama.id}`)}
+            className="bg-white rounded-[2rem] overflow-hidden border border-[#f1e7da] shadow-sm hover:shadow-md transition-all duration-500 grid grid-cols-1 lg:grid-cols-12 cursor-pointer group"
+          >
+            <div className="lg:col-span-7 h-64 sm:h-80 lg:h-full overflow-hidden relative">
+              <img
+                src={artikelUtama.image}
+                alt={artikelUtama.title}
+                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
+              />
+              <span className="absolute top-4 left-4 bg-[#2d2822] text-[#eadaaf] text-[9px] font-bold tracking-wider px-3 py-1 rounded uppercase">
+                Sorotan Utama
+              </span>
+            </div>
+            <div className="lg:col-span-5 p-6 md:p-10 flex flex-col justify-between items-start">
+              <div>
+                <span className="text-[#c29646] text-[10px] font-bold uppercase tracking-wider block mb-2">
+                  📍 {artikelUtama.kategori}
+                </span>
+                <h2 className="font-serif text-xl md:text-2xl font-bold text-[#3a2f21] leading-tight group-hover:text-[#c29646] transition-colors duration-300">
+                  {artikelUtama.title}
+                </h2>
+                <p className="text-gray-500 text-xs md:text-sm font-light leading-relaxed mt-3">
+                  {artikelUtama.excerpt}
+                </p>
+              </div>
 
-      {/* ══════════════════════════════════════════
-          3. SEARCH + FILTER
-      ══════════════════════════════════════════ */}
-      <div className="ab-controls">
-        <div className="ab-controls-inner">
-          <div className="ab-search-wrap">
-            <span className="ab-search-icon">🔍</span>
-            <input
-              type="text"
-              placeholder="Cari artikel..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="ab-search"
-            />
+              <div className="w-full pt-4 border-t border-[#fcf8f3] mt-6 flex items-center justify-between text-[11px] text-gray-400">
+                <div>
+                  <p className="font-medium text-[#534637]">
+                    {artikelUtama.penulis}
+                  </p>
+                  <p className="font-light text-[10px] mt-0.5">
+                    {artikelUtama.tanggal} • {artikelUtama.bacaan}
+                  </p>
+                </div>
+                <span className="text-[#c29646] font-semibold group-hover:translate-x-1 transition-transform">
+                  Baca Tulisan →
+                </span>
+              </div>
+            </div>
           </div>
-          <div className="ab-filters">
-            {KATEGORI.map((kat) => (
-              <button
-                key={kat}
-                className={`ab-pill ${aktif === kat ? "ab-active" : ""}`}
-                onClick={() => setAktif(kat)}
+        </section>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 3. GRID UTAMA ARTIKEL LAINNYA                                            */}
+      {/* ========================================================================= */}
+      <section className="px-6 md:px-16 max-w-6xl mx-auto">
+        <h3 className="font-serif text-xl font-bold text-[#3a2f21] mb-6 pb-2 border-b border-[#eedfc9]/40">
+          {searchQuery || selectedKategori !== "Semua"
+            ? "Hasil Pencarian Catatan"
+            : "Daftar Esai & Liputan"}
+        </h3>
+
+        {artikelFilter.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {artikelFilter.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => navigate(`/artikel/${item.id}`)}
+                className="bg-white rounded-2xl overflow-hidden border border-[#f3ece3] shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between group"
               >
-                {aktif === kat && "✓ "}
-                {kat}
-              </button>
+                <div>
+                  <div className="h-48 overflow-hidden relative bg-zinc-100">
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <span className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm text-[#3a2f21] text-[9px] font-bold px-2 py-0.5 rounded shadow-sm border border-[#eedfc9]/40">
+                      {item.kategori}
+                    </span>
+                  </div>
+
+                  <div className="p-5">
+                    <h4 className="font-serif text-sm font-bold text-[#3a2f21] line-clamp-2 leading-snug group-hover:text-[#c29646] transition-colors">
+                      {item.title}
+                    </h4>
+                    <p className="text-gray-500 text-xs font-light line-clamp-3 leading-relaxed mt-2">
+                      {item.excerpt}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="px-5 pb-5 pt-3 border-t border-[#fcf8f3] flex items-center justify-between text-[10px] text-gray-400">
+                  <div>
+                    <span className="block font-medium text-[#534637]">
+                      {item.penulis}
+                    </span>
+                    <span className="font-light text-[9px]">
+                      {item.tanggal}
+                    </span>
+                  </div>
+                  <span className="text-zinc-400 font-mono text-[9px] bg-[#fcf8f3] px-2 py-0.5 rounded border border-[#f1e7da]">
+                    {item.bacaan}
+                  </span>
+                </div>
+              </div>
             ))}
           </div>
-          <div className="ab-count">
-            <strong>{filtered.length}</strong> artikel
+        ) : (
+          <div className="text-center py-16 bg-white rounded-2xl border border-[#f3ece3] p-6">
+            <p className="text-sm text-gray-400 italic">
+              Tidak ada tajuk tulisan yang cocok dengan penyaringan Anda.
+            </p>
+            <button
+              onClick={() => {
+                setSearchQuery("");
+                setSelectedKategori("Semua");
+              }}
+              className="mt-4 text-xs font-medium text-[#c29646] hover:underline"
+            >
+              Bersihkan Filter
+            </button>
           </div>
-        </div>
-      </div>
-
-      {/* ══════════════════════════════════════════
-          4. EMPTY STATE
-      ══════════════════════════════════════════ */}
-      {filtered.length === 0 && (
-        <div className="ab-empty">
-          <div className="ab-empty-icon">🎭</div>
-          <div className="ab-empty-title">Artikel Tidak Ditemukan</div>
-          <div className="ab-empty-sub">
-            Coba kata kunci lain atau reset filter.
-          </div>
-          <button
-            className="ab-empty-btn"
-            onClick={() => {
-              setAktif("Semua");
-              setSearch("");
-            }}
-          >
-            Reset Filter
-          </button>
-        </div>
-      )}
-
-      {filtered.length > 0 && (
-        <>
-          {/* ══════════════════════════════════════
-              5. FEATURED EDITORIAL
-          ══════════════════════════════════════ */}
-          {featured && (
-            <div className="ab-featured-wrap">
-              <div className="ab-sec-label ab-anim ab-up">Artikel Pilihan</div>
-              <Link
-                to={`/budaya/${featured.id}`}
-                className="ab-feat-card ab-anim ab-scale"
-              >
-                <div className="ab-feat-img">
-                  <img
-                    src={featured.gambar}
-                    alt={featured.judul}
-                    onError={(e) => {
-                      e.target.src = `https://placehold.co/700x500/2d1f0a/c9a84c?text=${featured.judul}`;
-                    }}
-                  />
-                  <div className="ab-feat-num">01</div>
-                </div>
-                <div className="ab-feat-body">
-                  <div className="ab-feat-badge">
-                    ✦ &nbsp;{featured.kategori}
-                  </div>
-                  <div className="ab-feat-title">{featured.judul}</div>
-                  <div className="ab-feat-ring">{featured.ringkasan}</div>
-                  <div className="ab-feat-meta">
-                    <div className="ab-feat-meta-item">
-                      📅 {featured.tanggal}
-                    </div>
-                    <div className="ab-feat-meta-dot" />
-                    <div className="ab-feat-meta-item">⏱ {featured.menit}</div>
-                    <div className="ab-feat-meta-dot" />
-                    <div className="ab-feat-meta-item">
-                      ✍️ {featured.penulis}
-                    </div>
-                  </div>
-                  <div className="ab-feat-cta">
-                    <div className="ab-feat-cta-line" />
-                    Baca Artikel Lengkap
-                  </div>
-                </div>
-              </Link>
-            </div>
-          )}
-
-          {/* ══════════════════════════════════════
-              6. MASONRY GRID
-          ══════════════════════════════════════ */}
-          {lainnya.length > 0 && (
-            <div className="ab-grid-wrap">
-              <div className="ab-grid-hdr">
-                <div>
-                  <div
-                    className="ab-sec-label ab-anim ab-up"
-                    style={{ marginBottom: "10px" }}
-                  >
-                    Jelajahi Lebih Banyak
-                  </div>
-                  <h2 className="ab-grid-title ab-anim ab-up ab-d1">
-                    Cerita <span>Budaya</span> Lainnya
-                  </h2>
-                </div>
-              </div>
-              <div className="ab-masonry">
-                {lainnya.map((a, i) => (
-                  <Link
-                    key={a.id}
-                    to={`/budaya/${a.id}`}
-                    className={`ab-card ab-anim ab-up ab-d${Math.min((i % 4) + 1, 5)}`}
-                  >
-                    <div className="ab-card-img">
-                      <img
-                        src={a.gambar}
-                        alt={a.judul}
-                        onError={(e) => {
-                          e.target.src = `https://placehold.co/600x300/2d1f0a/c9a84c?text=${a.judul}`;
-                        }}
-                      />
-                      <span className="ab-card-badge">{a.kategori}</span>
-                      <div className="ab-card-overlay">
-                        <span className="ab-card-overlay-txt">
-                          Baca Artikel →
-                        </span>
-                      </div>
-                    </div>
-                    <div className="ab-card-body">
-                      <div className="ab-card-title">{a.judul}</div>
-                      <div className="ab-card-ring">{a.ringkasan}</div>
-                      <div className="ab-card-foot">
-                        <div className="ab-card-meta">
-                          <span>📅 {a.tanggal}</span>
-                          <span>·</span>
-                          <span>⏱ {a.menit}</span>
-                        </div>
-                        <span className="ab-card-arrow">→</span>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-        </>
-      )}
-
-      {/* ══════════════════════════════════════════
-          7. CTA
-      ══════════════════════════════════════════ */}
-      <div className="ab-cta">
-        <div className="ab-cta-bg" aria-hidden="true">
-          BUDAYA
-        </div>
-        <div className="ab-cta-inner">
-          <div className="ab-cta-eyebrow ab-anim ab-up">
-            ── Dari Kata Menuju Pengalaman ──
-          </div>
-          <h2 className="ab-cta-title ab-anim ab-up ab-d1">
-            Tak Cukup Hanya
-            <br />
-            <span>Membacanya</span>
-          </h2>
-          <p className="ab-cta-sub ab-anim ab-up ab-d2">
-            Setiap cerita budaya punya tempatnya. Kunjungi langsung, rasakan
-            sendiri, dan jadilah bagian dari pelestarian warisan Yogyakarta.
-          </p>
-          <div className="ab-cta-btns ab-anim ab-up ab-d3">
-            <Link to="/trip" className="ab-cta-btn-p">
-              Ikut Open Trip →
-            </Link>
-            <Link to="/budaya" className="ab-cta-btn-s">
-              ← Semua Budaya
-            </Link>
-          </div>
-          <div className="ab-cta-orn ab-anim ab-up ab-d4">✦ ❧ ✦</div>
-        </div>
-      </div>
+        )}
+      </section>
     </div>
   );
-}
+};
+
+export default ArtikelBudaya;
