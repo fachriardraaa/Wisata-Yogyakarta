@@ -1,0 +1,240 @@
+
+.authPage {
+	min-height: 100vh;
+	background: #e5e7eb;
+	padding: 110px 24px 64px;
+}
+
+.authShell {
+	max-width: 1120px;
+	margin: 0 auto;
+}
+
+.authHero {
+	position: relative;
+	min-height: 560px;
+	border-radius: 26px;
+	overflow: hidden;
+	background-image:
+		linear-gradient(
+			90deg,
+			rgba(255, 255, 255, 0.75) 0%,
+			rgba(255, 255, 255, 0.55) 38%,
+			rgba(255, 255, 255, 0) 58%
+		),
+		url("../../assets/images/identitasYogyakarta-user.png");
+	background-size: cover;
+	background-position: center;
+	box-shadow: 0 18px 45px rgba(0, 0, 0, 0.12);
+}
+
+.authHero::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.42);
+	pointer-events: none;
+}
+
+.authHero > * {
+	position: relative;
+	z-index: 1;
+}
+
+.authGlass {
+	width: min(460px, 92%);
+	margin: 48px;
+	padding: 44px 40px;
+	border-radius: 20px;
+	background: rgba(255, 255, 255, 0.55);
+	border: 1px solid rgba(255, 255, 255, 0.65);
+	backdrop-filter: blur(14px);
+	-webkit-backdrop-filter: blur(14px);
+}
+
+.authCopy {
+	margin-bottom: 20px;
+}
+
+.authHeading {
+	margin: 0 0 10px;
+	font-size: 2rem;
+	line-height: 2.25rem;
+	font-weight: 800;
+	color: #111827;
+}
+
+.authSubheading {
+	margin: 0;
+	color: #374151;
+	font-size: 0.95rem;
+	line-height: 1.5rem;
+}
+
+.authForm {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+.authField {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.authLabel {
+	font-weight: 600;
+	color: #1f2937;
+}
+
+.authInput {
+	width: 100%;
+	padding: 12px 14px;
+	border-radius: 12px;
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	background: rgba(255, 255, 255, 0.65);
+	color: #111827;
+	outline: none;
+	transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.authInputWrap {
+	position: relative;
+}
+
+.authInputWithToggle {
+	padding-right: 82px;
+}
+
+.authToggleBtn {
+	position: absolute;
+	top: 50%;
+	right: 12px;
+	transform: translateY(-50%);
+	background: transparent;
+	border: 0;
+	padding: 6px 8px;
+	border-radius: 999px;
+	cursor: pointer;
+	font-size: 0.85rem;
+	font-weight: 700;
+	color: #111827;
+	opacity: 0.75;
+}
+
+.authToggleBtn:hover {
+	opacity: 1;
+	background: rgba(255, 255, 255, 0.55);
+}
+
+.authInput:focus {
+	border-color: #059669;
+	box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.18);
+}
+
+.authHelpRow {
+	display: flex;
+	justify-content: flex-end;
+}
+
+.authForgot {
+	background: transparent;
+	border: 0;
+	padding: 0;
+	cursor: pointer;
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: #ef4444;
+}
+
+.authForgot:hover {
+	text-decoration: underline;
+}
+
+.authPrimaryBtn {
+	width: 100%;
+	margin-top: 4px;
+	padding: 12px 16px;
+	border-radius: 999px;
+	border: 0;
+	background: #111827;
+	color: #ffffff;
+	font-weight: 700;
+	cursor: pointer;
+	transition: background-color 150ms ease;
+}
+
+.authPrimaryBtn:hover {
+	background: #0b1220;
+}
+
+.authDivider {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin: 8px 0;
+}
+
+.authDividerLine {
+	flex: 1;
+	height: 1px;
+	background: #e5e7eb;
+}
+
+.authDividerText {
+	font-size: 0.875rem;
+	font-weight: 700;
+	color: #6b7280;
+}
+
+.authGoogleBtn {
+	width: 100%;
+	padding: 12px 16px;
+	border-radius: 999px;
+	border: 1px solid rgba(0, 0, 0, 0.12);
+	background: rgba(255, 255, 255, 0.7);
+	color: #1f2937;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background-color 150ms ease;
+}
+
+.authGoogleBtn:hover {
+	background: #f9fafb;
+}
+
+.authBottomText {
+	margin-top: 24px;
+	text-align: center;
+	font-size: 0.875rem;
+	color: #374151;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+}
+
+.authBottomLink {
+	color: #f59e0b;
+	font-weight: 800;
+	text-decoration: none;
+}
+
+.authBottomLink:hover {
+	text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+	.authPage {
+		padding: 96px 16px 48px;
+	}
+	.authHero {
+		min-height: 620px;
+	}
+	.authGlass {
+		margin: 20px auto;
+		padding: 28px 22px;
+	}
+}
+

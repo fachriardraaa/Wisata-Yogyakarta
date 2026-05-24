@@ -1,9 +1,22 @@
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+
+// IMPORT DATA DARI SERVICE
+import { dataOpenTrip } from '../../services/data/OpenTrip';
+import { previewWisata, previewBudaya } from '../../services/data/landingData';
+
+// IMPORT GAMBAR BACKGROUND HERO
 import bgHome from '../../assets/images/assetsbg-home-jogja.png';
 
+// IMPORT FILE CSS 
+import '../../style/home-style/home.css'; 
+
+const fadeInUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
+};
+
 function Home() {
-  // FUNGSI SCROLL MULUS
-  // Menangani perpindahan posisi layar ke elemen ID tertentu saat tombol diklik
   const scrollToSection = (id) => {
     const element = document.getElementById(id);
     if (element) {
@@ -11,49 +24,33 @@ function Home() {
     }
   };
 
-  // DATA PREVIEW (Wisata tanpa gambar sesuai permintaan)
-  const previewWisata = [
-    { judul: 'Pantai Timang', desc: 'Menunggu pembaruan konten dari tim wisata.', harga: 'Segera Hadir' },
-    { judul: 'Gunung Merapi', desc: 'Menunggu pembaruan konten dari tim wisata.', harga: 'Segera Hadir' },
-    { judul: 'Hutan Pinus', desc: 'Menunggu pembaruan konten dari tim wisata.', harga: 'Segera Hadir' },
-  ];
-
-  const previewBudaya = [
-    { judul: 'Kraton Yogyakarta', desc: 'Telusuri sejarah dan nilai-nilai luhur di pusat kerajaan Jawa.', harga: 'Rp 20.000', img: 'https://images.unsplash.com/photo-1578305691153-27e1fba73499?q=80&w=600' },
-    { judul: 'Wayang Kulit', desc: 'Nikmati pertunjukan epik mahakarya warisan budaya dunia.', harga: 'Gratis - Donasi', img: 'https://images.unsplash.com/photo-1615887023516-9fcafaa9250b?q=80&w=600' },
-  ];
-
-  const previewTrip = [
-    { judul: 'Sunrise Borobudur', desc: 'Saksikan matahari terbit dari kemegahan candi.', harga: 'Rp 450.000', img: 'https://images.unsplash.com/photo-1596402184320-417e7178b2cd?q=80&w=600' },
-  ];
+  // AMBIL 2 DATA PERTAMA DARI OPEN TRIP
+  const previewTrip = dataOpenTrip.slice(0, 2);
 
   return (
-    <div className="bg-gray-50">
+    <div className="bg-[#fcfaf7]">
+      
       {/* ================= HERO SECTION ================= */}
       <div
-        className="min-h-screen bg-cover bg-center flex items-center relative"
+        className="min-h-screen bg-cover bg-center bg-fixed flex items-center relative"
         style={{ backgroundImage: `url(${bgHome})` }}
       >
         <div className="bg-gray-900/60 absolute inset-0 z-0" />
         
         <div className="relative z-10 text-white text-center w-full px-6 flex flex-col items-center mt-16">
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-2">Rasakan Jiwa</h1>
-          <h2 className="text-6xl md:text-8xl font-extrabold text-amber-400 mb-6 drop-shadow-2xl">Budaya Asli</h2>
-          <p className="text-xl md:text-2xl mt-4 text-gray-200 mb-10 font-light max-w-2xl">
+          <h2 className="text-6xl md:text-8xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-600 mb-6 drop-shadow-2xl">
+            Budaya Asli
+          </h2>
+          <p className="text-xl md:text-2xl mt-4 text-gray-200 mb-10 font-light max-w-2xl leading-relaxed">
             Yogyakarta menunggumu dengan sejuta cerita, keindahan alam, dan pesona budaya.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button 
-              onClick={() => scrollToSection('section-wisata')}
-              className="px-8 py-3.5 bg-amber-500 text-gray-900 font-bold rounded-full hover:bg-amber-400 transition-all shadow-lg hover:shadow-amber-500/40"
-            >
+            <button onClick={() => scrollToSection('section-wisata')} className="btn-hero-primary">
               Eksplorasi Sekarang
             </button>
-            <button 
-              onClick={() => scrollToSection('section-trip')}
-              className="px-8 py-3.5 bg-white/10 backdrop-blur-sm border border-white/30 text-white font-semibold rounded-full hover:bg-white/20 transition-all"
-            >
+            <button onClick={() => scrollToSection('section-trip')} className="btn-hero-secondary">
               Lihat Open Trip
             </button>
           </div>
@@ -61,102 +58,153 @@ function Home() {
       </div>
 
       {/* ================= CONTENT PREVIEWS ================= */}
-      <div className="max-w-7xl mx-auto px-6 py-24 space-y-32">
+      <div className="max-w-7xl mx-auto px-6 py-24 space-y-40">
         
-        {/* --- SECTION WISATA (Tombol Hijau & Tanpa Gambar) --- */}
-        <section id="section-wisata" className="scroll-mt-24">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-8 border-b border-gray-200 pb-4">
+        {/* SECTION WISATA */}
+        <motion.section 
+          id="section-wisata" 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeInUp}
+        >
+          <div className="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-gray-200 pb-6">
             <div>
-              <h3 className="text-4xl font-bold text-gray-900 mb-2">Wisata Populer</h3>
-              <p className="text-gray-600">Konten dalam tahap pengembangan oleh tim wisata.</p>
+              <h3 className="text-5xl font-bold text-gray-900 serif">Wisata <span className="text-[#c9a452]">Populer</span></h3>
+              <p className="text-gray-600 mt-2">Jelajahi destinasi paling diminati di Yogyakarta.</p>
             </div>
-            {/* Tombol Wisata: Emerald (Hijau) */}
-            <Link to="/wisata" className="mt-4 md:mt-0 px-6 py-2 bg-emerald-700 text-white rounded-lg hover:bg-emerald-800 font-medium transition-colors">
-              Lihat Semua Wisata
+            <Link to="/wisata" className="mt-6 md:mt-0 px-8 py-3 bg-[#1a1207] text-white font-bold rounded-lg hover:bg-[#2d1f0a] transition-all shadow-md">
+              Lihat Semua Wisata →
             </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {previewWisata.map((item, index) => (
-              <div key={index} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 p-6 flex flex-col justify-center h-64">
-                <div className="bg-emerald-50 w-fit px-3 py-1 rounded-full text-emerald-700 text-xs font-bold mb-4">WISATA</div>
-                <h4 className="text-xl font-bold text-gray-900 mb-2">{item.judul}</h4>
-                <p className="text-sm text-gray-500 mb-6">{item.desc}</p>
-                <button className="mt-auto py-2 bg-emerald-50 text-emerald-700 font-bold rounded-lg cursor-not-allowed">
-                  {item.harga}
-                </button>
+              <div key={index} className="group relative rounded-[2rem] overflow-hidden shadow-lg h-[22rem] cursor-pointer">
+                <img src={item.gambar} alt={item.judul} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1a1207]/90 via-[#1a1207]/20 to-transparent"></div>
+                
+                <div className="absolute bottom-0 left-0 p-8 w-full flex flex-col justify-end h-full">
+                  <span className="text-[#c9a452] text-xs font-bold uppercase tracking-widest mb-2 drop-shadow-md">📍 {item.lokasi}</span>
+                  <h4 className="text-3xl font-bold text-white mb-6 serif drop-shadow-lg">{item.judul}</h4>
+                  <Link to={`/wisata/${item.id}`} className="inline-block w-full border border-[#c9a452] text-[#c9a452] backdrop-blur-sm text-center py-3 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-[#c9a452] hover:text-[#1a1207] transition-all duration-300 shadow-[0_0_15px_rgba(201,164,82,0.2)] hover:shadow-[0_0_25px_rgba(201,164,82,0.5)]">
+                    Lihat Detail
+                  </Link>
+                </div>
               </div>
             ))}
           </div>
-        </section>
+        </motion.section>
 
-        {/* --- SECTION BUDAYA (Tombol Coklat) --- */}
-        <section id="section-budaya" className="scroll-mt-24">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-8 border-b border-gray-200 pb-4">
+        {/* SECTION BUDAYA */}
+        <motion.section 
+          id="section-budaya" 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeInUp}
+        >
+          <div className="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-gray-200 pb-6">
             <div>
-              <h3 className="text-4xl font-bold text-gray-900 mb-2">Budaya & Tradisi</h3>
-              <p className="text-gray-600">Selami kekayaan kearifan lokal Yogyakarta.</p>
+              <h3 className="text-5xl font-bold text-gray-900 serif">Warisan & <span className="text-[#c9a452]">Identitas</span></h3>
             </div>
-            {/* Tombol Budaya: Coklat (Amber-900) */}
-            <Link to="/budaya" className="mt-4 md:mt-0 px-6 py-2 bg-[#5C4033] text-white rounded-lg hover:bg-[#4A3329] font-bold transition-all shadow-md">
+            <Link to="/budaya" className="px-8 py-3 bg-[#b8963e] text-white font-bold rounded-lg hover:bg-[#d4a843] transition-all">
               Lihat Semua Budaya
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            {previewBudaya.map((item, index) => (
+              <div key={index} className="card-warisan-home group">
+                <div className="h-64 overflow-hidden relative rounded-t-2xl">
+                   <img src={item.img} alt={item.judul} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                   <div className="absolute top-4 left-4 bg-[#2d1f0a]/80 text-[#c9a452] px-4 py-1 text-[10px] tracking-widest uppercase rounded-sm">
+                      Warisan Budaya
+                   </div>
+                </div>
+                <div className="p-6">
+                  <h4 className="text-2xl font-bold text-gray-900 mb-3 serif">{item.judul}</h4>
+                  <p className="text-gray-600 mb-6 text-sm leading-relaxed min-h-[40px]">{item.desc}</p>
+                  {/* LINK MENUJU DETAIL BUDAYA DINAMIS */}
+                  <Link to={`/budaya/${item.id}`} className="text-[#b8963e] font-bold text-xs uppercase tracking-widest hover:underline">
+                    Pelajari Sejarah →
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.section>
+
+        {/* SECTION OPEN TRIP */}
+        <motion.section 
+          id="section-trip" 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeInUp}
+        >
+          <div className="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-gray-200 pb-6">
+            <div>
+              <h3 className="text-5xl font-bold text-gray-900 serif">Open Trip <span className="text-[#c9a452]">Eksklusif</span></h3>
+              <p className="text-gray-600 mt-2">Agendakan petualangan kelompok terbaikmu tanpa repot bersama kami.</p>
+            </div>
+            <Link to="/trip" className="mt-6 md:mt-0 px-8 py-3 bg-[#c9a452] text-[#1a1207] font-bold rounded-lg hover:bg-[#b8963e] transition-all shadow-md text-sm tracking-wide">
+              Jelajahi Semua Trip →
             </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {previewBudaya.map((item, index) => (
-              <div key={index} className="bg-white rounded-2xl overflow-hidden shadow-md flex flex-col md:flex-row border border-gray-100">
-                <div className="md:w-1/2 h-56 md:h-auto">
-                  <img src={item.img} alt={item.judul} className="w-full h-full object-cover" />
-                </div>
-                <div className="p-6 md:w-1/2 flex flex-col justify-center">
-                  <h4 className="text-2xl font-bold text-gray-900 mb-2">{item.judul}</h4>
-                  <p className="text-gray-600 mb-6 text-sm">{item.desc}</p>
-                  <div className="mt-auto">
-                    {/* Tombol Detail Coklat */}
-                    <button className="w-full py-2 border-2 border-[#5C4033] text-[#5C4033] font-bold rounded-xl hover:bg-stone-100 transition-colors">
-                      Pelajari Detail
-                    </button>
+            {previewTrip.map((item) => (
+              <div 
+                key={item.id} 
+                className="group relative rounded-[2rem] overflow-hidden bg-white border border-gray-200/80 shadow-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(201,164,82,0.12)] hover:border-[#c9a452]"
+              >
+                <div className="flex flex-col sm:flex-row h-full">
+                  <div className="sm:w-1/2 h-52 sm:h-auto overflow-hidden relative">
+                    <img 
+                      src={item.gambar} 
+                      alt={item.nama} 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                    />
+                    <div className="absolute top-4 left-4 bg-orange-500 text-white px-4 py-1 text-[9px] tracking-widest uppercase font-bold rounded-full shadow-md">
+                      🔥 HOT DEALS
+                    </div>
+                  </div>
+                  
+                  <div className="sm:w-1/2 p-6 md:p-8 flex flex-col justify-between text-left bg-gradient-to-br from-white to-[#fcfaf7]">
+                    <div>
+                      <span className="text-[10px] font-bold text-[#c9a452] uppercase tracking-[0.2em] mb-1 block">
+                        📍 {item.lokasi}
+                      </span>
+                      <h4 className="text-xl md:text-2xl font-bold mb-3 serif text-gray-900 line-clamp-2 leading-snug">
+                        {item.nama}
+                      </h4>
+                      <div className="text-gray-500 text-xs flex items-center gap-3 mb-4 font-medium">
+                        <span>🕒 {item.durasi}</span>
+                        <span className="text-gray-300">|</span>
+                        <span>👥 Group Tour</span>
+                      </div>
+                    </div>
+                    
+                    <div className="pt-4 border-t border-gray-100 flex flex-col gap-3">
+                      <div>
+                        <small className="text-gray-400 text-[10px] uppercase tracking-widest block mb-0.5">Mulai dari</small>
+                        <div className="text-xl md:text-2xl font-bold text-[#1a1207] serif">
+                          Rp {item.harga.toLocaleString('id-ID')}
+                        </div>
+                      </div>
+                      <Link 
+                        to={`/trip/${item.id}`} 
+                        className="w-full bg-[#1a1207] text-white text-center py-3 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-[#c9a452] hover:text-[#1a1207] transition-all duration-300 shadow-sm"
+                      >
+                        Ikut Trip →
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-        </section>
-
-        {/* --- SECTION OPEN TRIP (Tombol Biru) --- */}
-        <section id="section-trip" className="scroll-mt-24">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-8 border-b border-gray-200 pb-4">
-            <div>
-              <h3 className="text-4xl font-bold text-gray-900 mb-2">Open Trip</h3>
-              <p className="text-gray-600">Petualangan seru bersama teman-teman baru.</p>
-            </div>
-            {/* Tombol Open Trip: Blue */}
-            <Link to="/trip" className="mt-4 md:mt-0 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold transition-colors shadow-md">
-              Lihat Semua Trip
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 gap-8">
-            {previewTrip.map((item, index) => (
-              <div key={index} className="bg-blue-600 rounded-3xl overflow-hidden shadow-xl flex flex-col md:flex-row text-white">
-                <div className="md:w-2/3 h-64 md:h-80">
-                  <img src={item.img} alt={item.judul} className="w-full h-full object-cover opacity-80" />
-                </div>
-                <div className="p-8 md:w-1/3 flex flex-col justify-center bg-blue-700">
-                  <h4 className="text-3xl font-bold mb-2">{item.judul}</h4>
-                  <p className="text-blue-100 mb-8">{item.desc}</p>
-                  <div className="flex items-center justify-between">
-                    <p className="font-bold text-xl">{item.harga}</p>
-                    <button className="px-6 py-2 bg-white text-blue-700 font-bold rounded-xl hover:bg-blue-50 transition-all">
-                      Ikut Trip
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+        </motion.section>
 
       </div>
     </div>

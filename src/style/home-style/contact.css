@@ -1,0 +1,87 @@
+/* src/style/home-style/contact.css */
+
+.contact-root {
+  /* POLA TITIK-TITIK HALUS SAMA SEPERTI ABOUT US */
+  background-color: #1a1a1a; 
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px);
+  background-size: 35px 35px; 
+  min-height: 100vh;
+  padding-top: 10rem; 
+  padding-bottom: 6rem;
+  position: relative; 
+}
+
+.contact-grid {
+  display: grid;
+  grid-cols-1: 1fr;
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .contact-grid {
+    grid-template-columns: 4fr 6fr;
+  }
+}
+
+/* KARTU KIRI */
+.contact-info-card {
+  background-color: #ffffff;
+  border-radius: 1.5rem;
+  border: 1px solid #374151;
+  padding: 3rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+/* KARTU KANAN (FORM) */
+.contact-form-card {
+  background-color: #ffffff;
+  border-radius: 1.5rem;
+  border: 1px solid #374151;
+  padding: 3rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+/* STYLING FORM FIELD */
+.form-input-field {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  background-color: #fcfaf7;
+  color: #111827;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.form-input-field:focus {
+  outline: none;
+  border-color: #c9a452;
+  box-shadow: 0 0 10px rgba(201, 164, 82, 0.15);
+  background-color: #ffffff;
+}
+
+/* TOMBOL SUBMIT KUNING EMAS MENYALA */
+.btn-form-submit {
+  width: 100%;
+  background-color: #1a1207;
+  color: #ffffff;
+  font-weight: 700;
+  padding: 1.2rem;
+  border-radius: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 0.75rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.btn-form-submit:hover {
+  background-color: #c9a452;
+  color: #1a1207;
+  border-color: #c9a452;
+  /* Efek pendaran cahaya kuning-emas menyala */
+  box-shadow: 0 0 25px rgba(201, 164, 82, 0.4);
+}
