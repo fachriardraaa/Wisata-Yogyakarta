@@ -1,312 +1,259 @@
-import { useEffect, useRef } from "react";
-import { useParams, Link } from "react-router-dom";
-import { dataBudaya } from "../../services/data/budayaData";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  initialBudayaItems,
+  extendedBudayaItems,
+} from "../../services/data/budayaData";
 import "../../style/budaya-style/DetailBudaya.css";
 
-/* ─── HOOK: Scroll-triggered animations ─────────────────────── */
-function useScrollAnimation() {
-  useEffect(() => {
-    const els = document.querySelectorAll(".db-anim");
+// Gabungkan data untuk pencarian item berdasarkan ID
+const allBudayaItems = [...initialBudayaItems, ...extendedBudayaItems];
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("db-visible");
-          }
-        });
-      },
-      { threshold: 0.12 },
-    );
-
-    els.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
-}
-
-/* ─── HOOK: Parallax hero ────────────────────────────────────── */
-function useParallax(ref) {
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!ref.current) return;
-      const scrollY = window.scrollY;
-      ref.current.style.transform = `translateY(${scrollY * 0.35}px)`;
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [ref]);
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   KOMPONEN UTAMA
-═══════════════════════════════════════════════════════════════ */
-export default function DetailBudaya() {
+const DetailBudaya = () => {
   const { id } = useParams();
-  const heroImgRef = useRef(null);
+  const navigate = useNavigate();
+  const [budaya, setBudaya] = useState(null);
+  const [activeTab, setActiveTab] = useState("sejarah");
 
-  const budaya = dataBudaya.find((b) => b.id === parseInt(id));
-  const relasiData = budaya
-    ? dataBudaya.filter((b) => budaya.relasi?.includes(b.id))
-    : [];
-
-  useScrollAnimation();
-  useParallax(heroImgRef);
-
-  /* Scroll ke atas saat halaman berganti */
+  // Cari data berdasarkan ID parameter URL
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    const foundItem = allBudayaItems.find(
+      (item) => item.id === parseInt(id) || item.id === id,
+    );
+    if (foundItem) {
+      setBudaya(foundItem);
+    }
+    // Auto scroll ke atas saat halaman dimuat
+    window.scrollTo(0, 0);
   }, [id]);
 
-  /* ── NOT FOUND ── */
+  // Jika data tidak ditemukan
   if (!budaya) {
     return (
-      <div className="db-notfound">
-        <h2>Budaya tidak ditemukan</h2>
-        <p>Halaman yang kamu cari tidak tersedia.</p>
-        <Link to="/budaya">← Kembali ke Daftar Budaya</Link>
+      <div className="min-h-screen bg-[#fcf8f3] flex flex-col justify-center items-center p-6 text-center">
+        <h2 className="text-2xl font-serif font-bold text-[#3a2f21] mb-2">
+          Arsip Tidak Ditemukan
+        </h2>
+        <p className="text-gray-500 text-sm max-w-sm mb-6">
+          Maaf, detail kebudayaan yang Anda cari belum terarsip atau telah
+          dipindahkan.
+        </p>
+        <button
+          onClick={() => navigate("/budaya")}
+          className="bg-[#c29646] hover:bg-[#a67c33] text-white text-xs font-medium px-5 py-2.5 rounded-xl transition duration-300"
+        >
+          ← Kembali ke List Budaya
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="db-root">
-      {/* ══════════════════════════════════════════
-          1. HERO — CINEMATIC PARALLAX
-      ══════════════════════════════════════════ */}
-      <section className="db-hero">
-        {/* Bar atas seperti film */}
-        <div className="db-hero-bar-top" />
+    <div className="detail-budaya-container bg-[#fcf8f3] text-[#2c2115] min-h-screen font-sans pb-24">
+      {/* ========================================================================= */}
+      {/* 1. HERO HEADER BANNER (SINEMATIK DENGAN GRADIENT OVERLAY)               */}
+      {/* ========================================================================= */}
+      <section className="relative h-[60vh] md:h-[70vh] w-full overflow-hidden bg-black">
+        <img
+          src={budaya.image}
+          alt={budaya.title}
+          className="w-full h-full object-cover opacity-80 animate-fade-blur"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#fcf8f3] via-black/40 to-black/60 z-10"></div>
 
-        {/* Background parallax */}
-        <div className="db-hero-img" ref={heroImgRef}>
-          <img
-            src={budaya.gambar}
-            alt={budaya.nama}
-            onError={(e) => {
-              e.target.src = `https://placehold.co/1600x900/2d1f0a/c9a84c?text=${budaya.nama}`;
-            }}
-          />
+        {/* Tombol Kembali Floating */}
+        <div className="absolute top-28 left-6 md:left-16 z-20">
+          <button
+            onClick={() => navigate("/budaya")}
+            className="bg-black/40 hover:bg-black/60 backdrop-blur-md text-white text-xs font-medium px-4 py-2.5 rounded-xl border border-white/10 flex items-center gap-2 transition duration-300 shadow-lg"
+          >
+            <span>←</span> Kembali ke Penjelajah
+          </button>
         </div>
 
-        {/* Overlay gelap sinematik */}
-        <div className="db-hero-overlay" />
-
-        {/* Breadcrumb */}
-        <div className="db-hero-breadcrumb">
-          <Link to="/">Beranda</Link>
-          <span>›</span>
-          <Link to="/budaya">Budaya</Link>
-          <span>›</span>
-          <span className="db-hero-breadcrumb-cur">{budaya.nama}</span>
+        {/* Informasi Utama di Atas Gambar */}
+        <div className="absolute bottom-0 inset-x-0 px-6 md:px-16 pb-12 z-20 max-w-5xl mx-auto flex flex-col justify-end h-full pointer-events-none">
+          <span className="bg-[#e2b254] text-[#2c2115] text-[10px] font-bold px-3 py-1 rounded shadow-md w-fit uppercase tracking-wider mb-4">
+            {budaya.tag || "Warisan Budaya"}
+          </span>
+          <h1 className="text-3xl md:text-5xl font-serif font-bold text-[#3a2f21] md:text-white leading-tight drop-shadow-sm">
+            {budaya.title}
+          </h1>
+          <p className="text-xs md:text-sm text-gray-700 md:text-gray-200 mt-2 flex items-center gap-2 font-light">
+            <span>📍</span> Wilayah Daerah Istimewa Yogyakarta •{" "}
+            <span className="font-medium text-[#c29646] md:text-[#eadaaf]">
+              Kabupaten/Kota {budaya.region}
+            </span>
+          </p>
         </div>
-
-        {/* Konten teks */}
-        <div className="db-hero-body">
-          <div className="db-hero-kategori">{budaya.kategori}</div>
-          <h1 className="db-hero-title">{budaya.nama}</h1>
-          <p className="db-hero-tagline">{budaya.tagline}</p>
-
-          {/* Strip info */}
-          <div className="db-hero-strip">
-            <div className="db-hero-strip-item">
-              📍 <strong>{budaya.lokasi}</strong>
-            </div>
-            <div className="db-hero-strip-divider" />
-            <div className="db-hero-strip-item">
-              🕐 <strong>{budaya.waktu}</strong>
-            </div>
-            <div className="db-hero-strip-divider" />
-            <div className="db-hero-strip-item">
-              🎫 <strong>{budaya.tiket}</strong>
-            </div>
-          </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="db-hero-scroll">
-          <div className="db-hero-scroll-line" />
-          <span className="db-hero-scroll-text">Scroll</span>
-        </div>
-
-        {/* Bar bawah */}
-        <div className="db-hero-bar-bottom" />
       </section>
 
-      {/* ══════════════════════════════════════════
-          2. MAIN CONTENT + SIDEBAR
-      ══════════════════════════════════════════ */}
-      <div className="db-main">
-        {/* ── KIRI: ARTIKEL ── */}
-        <article className="db-content">
-          {/* Ornamen garis */}
-          <div className="db-ornament-line db-anim db-anim--up">
-            <div className="db-ornament-diamond" />
-          </div>
-
-          {/* Deskripsi sebagai lead quote */}
-          <blockquote className="db-lead-quote db-anim db-anim--up db-delay-1">
-            {budaya.deskripsi}
-          </blockquote>
-
-          {/* Paragraf artikel */}
-          {budaya.paragraf.map((p, i) => (
-            <p
-              key={i}
-              className={`db-para db-anim db-anim--up db-delay-${Math.min(i + 1, 5)}`}
-              style={i > 0 ? { fontSize: "16px" } : {}}
+      {/* ========================================================================= */}
+      {/* 2. DUAL-COLUMN LAYOUT KONTEN UTAMA                                      */}
+      {/* ========================================================================= */}
+      <section className="max-w-6xl mx-auto px-6 md:px-16 mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* KOLOM KIRI: DOKUMENTASI, FILOSOFI, & TAB SEJARAH (8 KOLOM) */}
+        <div className="lg:col-span-8 space-y-8">
+          {/* Menu Tab Kontrol Deskripsi */}
+          <div className="bg-white rounded-2xl p-2 border border-[#eedfc9]/60 shadow-sm flex gap-2">
+            <button
+              onClick={() => setActiveTab("sejarah")}
+              className={`flex-1 text-center py-2.5 text-xs font-medium tracking-wide rounded-xl transition-all duration-300 ${
+                activeTab === "sejarah"
+                  ? "bg-[#2d2822] text-white shadow-md font-semibold"
+                  : "text-[#534637] hover:bg-[#faf5ee]"
+              }`}
             >
-              {/* Hanya paragraf pertama yang punya drop cap */}
-              {i > 0 ? p : p}
-            </p>
-          ))}
-
-          {/* Divider ornamen */}
-          <div className="db-section-divider db-anim db-anim--up">✦ ❧ ✦</div>
-
-          {/* ── FAKTA SECTION — TIMELINE ── */}
-          <div className="db-fakta-section db-anim db-anim--up">
-            <div className="db-fakta-eyebrow">Tahukah Kamu?</div>
-            <div className="db-fakta-title">
-              Fakta Menarik tentang {budaya.nama}
-            </div>
-            <div className="db-fakta-list">
-              {budaya.fakta.map((f, i) => (
-                <div
-                  key={i}
-                  className={`db-fakta-item db-anim db-anim--left db-delay-${i + 1}`}
-                >
-                  <div className="db-fakta-dot">{i + 1}</div>
-                  <p className="db-fakta-text">{f}</p>
-                </div>
-              ))}
-            </div>
+              📖 Sejarah & Filosofi
+            </button>
+            <button
+              onClick={() => setActiveTab("galeri")}
+              className={`flex-1 text-center py-2.5 text-xs font-medium tracking-wide rounded-xl transition-all duration-300 ${
+                activeTab === "galeri"
+                  ? "bg-[#2d2822] text-white shadow-md font-semibold"
+                  : "text-[#534637] hover:bg-[#faf5ee]"
+              }`}
+            >
+              🖼️ Dokumentasi Visual
+            </button>
           </div>
 
-          {/* ── BUDAYA TERKAIT — MASONRY ── */}
-          {relasiData.length > 0 && (
-            <div className="db-relasi-section">
-              <div className="db-relasi-header db-anim db-anim--up">
+          {/* Isi Konten Berdasarkan Tab Aktif */}
+          <div className="bg-white rounded-3xl border border-[#eedfc9]/50 p-6 md:p-8 shadow-sm">
+            {activeTab === "sejarah" ? (
+              <div className="space-y-6 animate-fade-in">
                 <div>
-                  <div className="db-relasi-eyebrow">── Jelajahi Lebih ──</div>
-                  <div className="db-relasi-title">Budaya Terkait</div>
+                  <h3 className="font-serif text-lg font-bold text-[#3a2f21] mb-3">
+                    Ringkasan Narasi
+                  </h3>
+                  <p className="text-gray-600 text-sm leading-relaxed font-light">
+                    {budaya.description} Kebudayaan ini mencerminkan tatanan
+                    nilai luhur yang diwariskan turun-temurun sejak era kejayaan
+                    Kesultanan Mataram Islam, menjadi jembatan spiritual dan
+                    ekspresi sosial yang hidup di tengah masyarakat modern
+                    Daerah Istimewa Yogyakarta.
+                  </p>
                 </div>
-                <Link to="/budaya" className="db-relasi-see-all">
-                  Lihat Semua →
-                </Link>
-              </div>
 
-              <div className="db-relasi-grid">
-                {relasiData.map((rel, i) => (
-                  <Link
-                    key={rel.id}
-                    to={`/budaya/${rel.id}`}
-                    className={`db-relasi-card db-anim db-anim--scale db-delay-${i + 1}`}
-                  >
+                <div className="border-t border-[#fcf8f3] pt-6">
+                  <h3 className="font-serif text-lg font-bold text-[#3a2f21] mb-3">
+                    Nilai Filosofis & Esensi Luhur
+                  </h3>
+                  <blockquote className="border-l-4 border-[#c29646] bg-[#fcf8f3] p-4 text-xs md:text-sm italic text-gray-600 rounded-r-xl leading-relaxed">
+                    "Setiap struktur gerak, ragam hias motif, ritual, maupun
+                    ritme instrumen tidak pernah diciptakan sekadar untuk
+                    estetika visual belaka, melainkan sarat akan doa, tata krama
+                    hidup, hubungan harmonis manusia dengan alam, serta sujud
+                    syukur kehadirat Sang Pencipta semesta."
+                  </blockquote>
+                  <p className="text-gray-600 text-sm leading-relaxed font-light mt-4">
+                    Hingga hari ini, kelestarian kebudayaan ini terus dijaga
+                    ketat melalui sistem adat istana keraton maupun inisiatif
+                    mandiri desa wisata budaya di seluruh penjuru DIY,
+                    menjadikannya elemen vital identitas kota budaya.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-6 animate-fade-in">
+                <h3 className="font-serif text-lg font-bold text-[#3a2f21] mb-2">
+                  Arsip Galeri Visual
+                </h3>
+                <p className="text-gray-500 text-xs font-light">
+                  Koleksi dokumentasi otentik kebudayaan {budaya.title} di
+                  lapangan.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                  <div className="rounded-2xl overflow-hidden aspect-video bg-zinc-100 border border-zinc-200">
                     <img
-                      src={rel.gambar}
-                      alt={rel.nama}
-                      onError={(e) => {
-                        e.target.src = `https://placehold.co/600x400/2d1f0a/c9a84c?text=${rel.nama}`;
-                      }}
+                      src={budaya.image}
+                      alt=""
+                      className="w-full h-full object-cover hover:scale-105 transition duration-500"
                     />
-                    <div className="db-relasi-card-body">
-                      <div className="db-relasi-card-kat">{rel.kategori}</div>
-                      <div className="db-relasi-card-nama">{rel.nama}</div>
-                      <div className="db-relasi-card-tagline">
-                        {rel.tagline}
-                      </div>
-                    </div>
-                  </Link>
-                ))}
+                  </div>
+                  <div className="rounded-2xl overflow-hidden aspect-video bg-zinc-100 border border-zinc-200 flex items-center justify-center text-center p-4">
+                    <p className="text-xs text-gray-400 italic">
+                      Dokumentasi Tambahan Segera Diunggah dalam Pembaruan Arsip
+                      Digital
+                    </p>
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
-        </article>
+            )}
+          </div>
+        </div>
 
-        {/* ── KANAN: SIDEBAR STICKY ── */}
-        <aside className="db-sidebar">
-          {/* Info Kunjungan */}
-          <div className="db-info-box db-anim db-anim--right">
-            <div className="db-info-box-header">
-              <div className="db-info-box-eyebrow">Panduan Kunjungan</div>
-              <div className="db-info-box-title">{budaya.nama}</div>
-            </div>
-            <div className="db-info-body">
-              <div className="db-info-row">
-                <div className="db-info-label">Lokasi</div>
-                <div className="db-info-val">📍 {budaya.lokasi}</div>
+        {/* KOLOM KANAN: METADATA & SIDEBAR DETAIL PENDUKUNG (4 KOLOM) */}
+        <div className="lg:col-span-4 space-y-6">
+          {/* Ringkasan Informasi Ringkas */}
+          <div className="bg-white rounded-3xl border border-[#eedfc9]/50 p-6 shadow-sm">
+            <h4 className="font-serif text-base font-bold text-[#3a2f21] pb-3 border-b border-[#fcf8f3] mb-4">
+              Metadata Arsip
+            </h4>
+
+            <div className="space-y-4">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-gray-400 block tracking-wider">
+                  Kategori Utama
+                </span>
+                <span className="text-sm font-medium text-[#3a2f21]">
+                  {budaya.tag || "Warisan Budaya"}
+                </span>
               </div>
-              <div className="db-info-divider" />
-              <div className="db-info-row">
-                <div className="db-info-label">Waktu Kunjungan</div>
-                <div className="db-info-val">🕐 {budaya.waktu}</div>
+
+              <div>
+                <span className="text-[10px] uppercase font-bold text-gray-400 block tracking-wider">
+                  Wilayah Cakupan
+                </span>
+                <span className="text-sm font-medium text-[#3a2f21]">
+                  Kabupaten / Kota {budaya.region}
+                </span>
               </div>
-              <div className="db-info-divider" />
-              <div className="db-info-row">
-                <div className="db-info-label">Tiket Masuk</div>
-                <div className="db-info-val">🎫 {budaya.tiket}</div>
+
+              <div>
+                <span className="text-[10px] uppercase font-bold text-gray-400 block tracking-wider">
+                  Status Kelestarian
+                </span>
+                <span className="text-xs inline-flex items-center gap-1.5 font-semibold text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-full mt-1 border border-teal-200">
+                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500"></span>{" "}
+                  Aktif & Terjaga
+                </span>
+              </div>
+
+              <div>
+                <span className="text-[10px] uppercase font-bold text-gray-400 block tracking-wider">
+                  Otoritas Pengarsipan
+                </span>
+                <span className="text-xs text-gray-500 font-light block mt-0.5">
+                  E-Arsip Budaya & Sejarah Yogyakarta v2026
+                </span>
               </div>
             </div>
           </div>
 
-          {/* CTA Open Trip */}
-          <div className="db-cta-box db-anim db-anim--right db-delay-1">
-            <div className="db-cta-eyebrow">Pengalaman Nyata</div>
-            <div className="db-cta-title">
-              Rasakan {budaya.nama} Secara Langsung
-            </div>
-            <div className="db-cta-sub">
-              Bergabunglah dalam open trip budaya bersama pemandu lokal
-              berpengalaman.
-            </div>
-            <Link to="/trip" className="db-cta-btn">
-              Lihat Open Trip →
-            </Link>
-          </div>
+          {/* Kotak Edukasi / Ajakan Aksi Tradisi */}
+          <div className="bg-[#2d2822] text-white rounded-3xl p-6 shadow-md relative overflow-hidden group">
+            <div className="absolute right-0 bottom-0 w-32 h-32 bg-white/5 rounded-full translate-x-8 translate-y-8 group-hover:scale-110 transition duration-500"></div>
 
-          {/* Tombol Navigasi */}
-          <div className="db-nav-btns db-anim db-anim--right db-delay-2">
-            <Link to="/budaya" className="db-btn-back">
-              ← Kembali ke Daftar
-            </Link>
-            <Link to="/budaya/artikel" className="db-btn-artikel">
-              📖 Baca Artikel Budaya
-            </Link>
+            <span className="text-[10px] font-bold text-[#eadaaf] uppercase tracking-widest block mb-1">
+              Edukasi Komunitas
+            </span>
+            <h5 className="font-serif text-base font-bold mb-3 leading-snug">
+              Tertarik Menyaksikan / Belajar Langsung?
+            </h5>
+            <p className="text-gray-300 text-xs font-light leading-relaxed mb-4">
+              Anda dapat mengunjungi pusat latihan sanggar, museum, atau desa
+              wisata terkait untuk ikut melestarikan warisan adiluhung ini.
+            </p>
+            <button className="w-full bg-[#c29646] hover:bg-[#a67c33] text-white text-xs font-medium py-2.5 rounded-xl transition duration-300 shadow-sm uppercase tracking-wider">
+              Hubungi Kontak Paguyuban
+            </button>
           </div>
-
-          {/* Share */}
-          <div className="db-share-box db-anim db-anim--right db-delay-3">
-            <div className="db-share-label">Bagikan</div>
-            <div className="db-share-btns">
-              <a
-                href={`https://wa.me/?text=Baca tentang ${budaya.nama} di Hiling Semata!`}
-                target="_blank"
-                rel="noreferrer"
-                className="db-share-btn"
-              >
-                WA
-              </a>
-              <a
-                href={`https://www.facebook.com/sharer/sharer.php?u=${window.location.href}`}
-                target="_blank"
-                rel="noreferrer"
-                className="db-share-btn"
-              >
-                FB
-              </a>
-              <button
-                className="db-share-btn"
-                onClick={() => {
-                  navigator.clipboard.writeText(window.location.href);
-                  alert("Link disalin!");
-                }}
-              >
-                Copy
-              </button>
-            </div>
-          </div>
-        </aside>
-      </div>
+        </div>
+      </section>
     </div>
   );
-}
+};
+
+export default DetailBudaya;

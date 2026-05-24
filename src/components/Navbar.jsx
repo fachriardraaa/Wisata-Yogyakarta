@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./Navbar.css";
 
 const NAV_LINKS = [
@@ -12,139 +12,225 @@ const NAV_LINKS = [
 ];
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [user, setUser] = useState(null);
+
   const location = useLocation();
+  const navigate = useNavigate();
+  const dropdownRef = useRef(null);
 
-  /* Bayangan saat scroll */
+  // 1. Cek status login user dari localStorage saat komponen dimuat
   useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 10);
-    window.addEventListener("scroll", fn, { passive: true });
-    return () => window.removeEventListener("scroll", fn);
-  }, []);
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        setUser(null);
+      }
+    }
+  }, [location]); // Cek ulang setiap kali pindah halaman
 
-  /* Tutup menu saat pindah halaman */
+  // 2. Menutup menu mobile saat berpindah rute
   useEffect(() => {
     setMenuOpen(false);
+    setDropdownOpen(false);
   }, [location]);
 
-  /* Lock scroll saat mobile menu buka */
+  // 3. Mengunci scroll body saat menu mobile aktif
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
   }, [menuOpen]);
+
+  // 4. Menutup dropdown profil saat klik di luar area menu
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const isActive = (path) =>
     path === "/"
       ? location.pathname === "/"
       : location.pathname.startsWith(path);
 
+  // Fungsi penanganan keluar akun (Logout)
+  const handleLogout = () => {
+    localStorage.removeItem("user"); // Hapus data sesi login
+    setUser(null);
+    setDropdownOpen(false);
+    navigate("/"); // Kembalikan ke halaman beranda
+  };
+
   return (
     <>
-      <nav className={`nav ${scrolled ? "nav--scrolled" : ""}`}>
-        <div className="nav-inner">
-          {/* ── LOGO ── */}
-          <Link to="/" className="nav-logo">
-            <img
-              src="../src/assets/logo/logo.png"
-              alt="Hiling Semata"
-              className="nav-logo-img"
-              onError={(e) => {
-                e.target.style.display = "none";
-                e.target.nextSibling.style.display = "flex";
-              }}
-            />
-            {/* Fallback teks */}
-            <span className="nav-logo-text" style={{ display: "none" }}>
-              <span className="nav-logo-hs">HS</span>
-              <span className="nav-logo-words">
-                <span>
-                  <span className="nav-logo-hiling">Hiling</span>
-                  <span className="nav-logo-semata"> Semata</span>
-                </span>
-                <span className="nav-logo-sub">Tour & Travel</span>
-              </span>
-            </span>
+      <nav className="navbar">
+        <div className="navbar-container">
+          {/* Logo */}
+          <Link to="/" className="logo">
+            <div className="logo-box">HS</div>
+            <div className="logo-text">
+              <h2>
+                Hiling <span>Semata</span>
+              </h2>
+              <p>TOUR & TRAVEL</p>
+            </div>
           </Link>
 
-          {/* ── LINKS DESKTOP ── */}
+          {/* Desktop Links */}
           <div className="nav-links">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
-                className={`nav-link ${isActive(link.path) ? "nav-link--active" : ""}`}
+                className={`nav-link ${isActive(link.path) ? "active" : ""}`}
               >
                 {link.name}
-                <span className="nav-link-bar" />
               </Link>
             ))}
           </div>
 
-          {/* ── AKSI KANAN ── */}
-          <div className="nav-actions">
-            <Link to="/login" className="nav-btn-login">
-              Masuk
-            </Link>
-            <Link to="/register" className="nav-btn-register">
-              Daftar
-            </Link>
+          {/* Buttons / User Profile Kondisional */}
+          <div className="nav-buttons">
+            {user ? (
+              /* Tampilan Jika Sudah Login (Nama + Foto + Dropdown) */
+              <div className="nav-user-profile" ref={dropdownRef}>
+                <button
+                  className="profile-trigger"
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                >
+                  <img
+                    src={
+                      user.photo ||
+                      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100"
+                    }
+                    alt={user.username}
+                    className="profile-avatar"
+                  />
+                  <span className="profile-name">
+                    {user.username || user.name}
+                  </span>
+                  <span className={`profile-arrow ${dropdownOpen ? "up" : ""}`}>
+                    ▼
+                  </span>
+                </button>
+
+                {/* Dropdown Menu */}
+                {dropdownOpen && (
+                  <div className="profile-dropdown">
+                    <div className="dropdown-header">
+                      <p className="user-title">{user.name}</p>
+                      <p className="user-email">
+                        {user.email || "User Member"}
+                      </p>
+                    </div>
+                    <Link to="/dashboard" className="dropdown-item">
+                      📁 Dashboard
+                    </Link>
+                    <Link to="/dashboard/riwayat" className="dropdown-item">
+                      ⏳ Riwayat Booking
+                    </Link>
+                    <hr className="dropdown-divider" />
+                    <button
+                      onClick={handleLogout}
+                      className="dropdown-item text-danger"
+                    >
+                      🚪 Keluar Akun
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* Tampilan Default Jika Belum Login */
+              <>
+                <Link to="/login" className="btn-login">
+                  Masuk
+                </Link>
+                <Link to="/register" className="btn-register">
+                  Daftar
+                </Link>
+              </>
+            )}
           </div>
 
-          {/* ── HAMBURGER MOBILE ── */}
+          {/* Hamburger Menu Mobile */}
           <button
-            className={`nav-hamburger ${menuOpen ? "nav-hamburger--open" : ""}`}
+            className={`hamburger ${menuOpen ? "open" : ""}`}
             onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle menu"
           >
-            <span className="nav-ham-line" />
-            <span className="nav-ham-line" />
-            <span className="nav-ham-line" />
+            <span />
+            <span />
+            <span />
           </button>
         </div>
       </nav>
 
-      {/* ── MOBILE MENU ── */}
-      <div className={`nav-mobile ${menuOpen ? "nav-mobile--open" : ""}`}>
-        <div className="nav-mobile-inner">
-          <div className="nav-mobile-links">
-            {NAV_LINKS.map((link, i) => (
+      {/* Mobile Menu */}
+      <div className={`mobile-menu ${menuOpen ? "show" : ""}`}>
+        {NAV_LINKS.map((link, index) => (
+          <Link
+            key={link.path}
+            to={link.path}
+            className={`mobile-link ${
+              isActive(link.path) ? "mobile-active" : ""
+            }`}
+            style={{ animationDelay: `${index * 0.08}s` }}
+          >
+            {link.name}
+          </Link>
+        ))}
+
+        {/* Tombol Mobile Kondisional */}
+        <div className="mobile-buttons">
+          {user ? (
+            <div className="mobile-user-info">
+              <div className="mobile-profile-card">
+                <img
+                  src={
+                    user.photo ||
+                    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100"
+                  }
+                  alt={user.username}
+                />
+                <div>
+                  <h4>{user.username || user.name}</h4>
+                  <p>{user.email || "Member Hiling Semata"}</p>
+                </div>
+              </div>
               <Link
-                key={link.path}
-                to={link.path}
-                className={`nav-mobile-link ${isActive(link.path) ? "nav-mobile-link--active" : ""}`}
-                style={{ animationDelay: `${i * 0.055}s` }}
+                to="/dashboard"
+                className="btn-register mobile-btn text-center"
               >
-                <span className="nav-mobile-num">0{i + 1}</span>
-                {link.name}
-                <span className="nav-mobile-arrow">→</span>
+                Dashboard
               </Link>
-            ))}
-          </div>
-
-          <div className="nav-mobile-btns">
-            <Link to="/login" className="nav-mobile-btn nav-mobile-btn--ghost">
-              Masuk
-            </Link>
-            <Link
-              to="/register"
-              className="nav-mobile-btn nav-mobile-btn--solid"
-            >
-              Daftar Sekarang
-            </Link>
-          </div>
-
-          <div className="nav-mobile-footer">
-            © 2025 Hiling Semata · Yogyakarta
-          </div>
+              <button
+                onClick={handleLogout}
+                className="btn-login mobile-btn w-full"
+              >
+                Keluar Akun
+              </button>
+            </div>
+          ) : (
+            <>
+              <Link to="/login" className="btn-login mobile-btn">
+                Masuk
+              </Link>
+              <Link to="/register" className="btn-register mobile-btn">
+                Daftar
+              </Link>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Backdrop overlay */}
+      {/* Overlay */}
       {menuOpen && (
-        <div className="nav-backdrop" onClick={() => setMenuOpen(false)} />
+        <div className="mobile-overlay" onClick={() => setMenuOpen(false)} />
       )}
     </>
   );
