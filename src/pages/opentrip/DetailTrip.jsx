@@ -29,7 +29,7 @@ function DetailTrip() {
         <img src={trip.gambar} alt={trip.nama} className="detail-hero-image" />
         <div className="detail-overlay">
           <span className="trip-category">{trip.kategori}</span>
-          <h1>{trip.nama}</h1>
+          <h1 style={{ fontWeight: 'bold' }}>{trip.nama}</h1>
           <p>{trip.durasi} • {trip.lokasi}</p>
         </div>
       </div>

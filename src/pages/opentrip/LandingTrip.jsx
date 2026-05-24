@@ -1,77 +1,134 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { dataOpenTrip } from '../../services/data/OpenTrip';
 import '../../style/OpenTrip/LandingTrip.css';
+import { Link } from 'react-router-dom';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.3 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+};
 
 const LandingTrip = () => {
-  // Ambil trip termahal/terbaik untuk "Exclusive Signature"
-  const signatureTrip = dataOpenTrip[0];
-  const otherTrips = dataOpenTrip.slice(1, 4);
+  const [index, setIndex] = useState(0);
+
+  // Auto-slide dari kanan ke kiri
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % dataOpenTrip.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
+  
+
+  const handlePrev = () => {
+    setIndex((prev) => (prev - 1 + dataOpenTrip.length) % dataOpenTrip.length);
+  };
+
+  const handleNext = () => {
+    setIndex((prev) => (prev + 1) % dataOpenTrip.length);
+  };
+
+  // Mengambil 3 item untuk ditampilkan (kiri, tengah/zoom, kanan)
+  const getVisibleItems = () => {
+    const items = [];
+    for (let i = -1; i <= 1; i++) {
+      let idx = (index + i + dataOpenTrip.length) % dataOpenTrip.length;
+      items.push({ ...dataOpenTrip[idx], position: i });
+    }
+    return items;
+  };
 
   return (
-    <div className="exclusive-landing">
-      {/* SECTION 1: LUXURY HERO */}
-      <section className="luxury-hero">
-        <div className="hero-visual-split">
-          <div className="hero-text-side">
-            <div className="reveal-text">
-              <span className="gold-label">Premium Experience</span>
-              <h1>Beyond <br />Ordinary <br /><span className="serif-italic">Travel.</span></h1>
-              <p>Hanya untuk Anda yang menginginkan lebih dari sekadar perjalanan biasa. Rasakan eksklusivitas di setiap langkah.</p>
-              <button className="cta-luxury">Explore Signature Trips</button>
-            </div>
-          </div>
-          <div className="hero-image-side">
-            <img src={signatureTrip.gambar} alt="Luxury Destination" />
-            <div className="floating-info-card">
-              <span>Next Departure</span>
-              <strong>{signatureTrip.tanggalKeberangkatan}</strong>
-            </div>
-          </div>
+    <div className="landing-exclusive">
+      {/* Hero Header */}
+      <section className="hero-landing">
+        <div className="hero-content-ex">
+          <span className="badge-exclusive">EXCLUSIVE OPEN TRIP</span>
+          <h1>Jelajahi Indonesia <br /><span>Bersama Kami</span></h1>
+          <p>Temukan pengalaman terbaik menjelajahi destinasi menakjubkan bersama komunitas traveler lainnya.</p>
+
+          <Link to="/trip" className="btn-gold-action">
+            Lihat Open Trip →
+          </Link>
         </div>
       </section>
 
-      {/* SECTION 2: SIGNATURE SHOWCASE (Asymmetric) */}
-      <section className="signature-showcase">
-        <div className="vertical-title">SIGNATURE</div>
-        <div className="showcase-content">
-          <div className="featured-big-card">
-            <div className="img-container">
-              <img src={signatureTrip.gambar} alt={signatureTrip.nama} />
-              <div className="luxury-badge">Signature Trip</div>
-            </div>
-            <div className="details-overlay">
-              <h2>{signatureTrip.nama}</h2>
-              <p>{signatureTrip.deskripsiLengkap}</p>
-              <div className="stats-row">
-                <span>{signatureTrip.durasi}</span>
-                <span className="divider">|</span>
-                <span>Limited to {signatureTrip.kuota} Guests</span>
-              </div>
-            </div>
-          </div>
+      {/* Carousel Section */}
+      <section className="trip-carousel-section">
+        <div className="section-title-center">
+          <span className="gold-text">OPEN TRIP TERBARU</span>
+          <h2>Open Trip Pilihan Untukmu</h2>
         </div>
-      </section>
 
-      {/* SECTION 3: CURATED LIST (Minimalist Grid) */}
-      <section className="curated-list">
-        <div className="curated-header">
-          <h2>Curated Experiences</h2>
-          <div className="gold-line"></div>
+        <div className="carousel-container">
+          <div className="carousel-wrapper">
+            <AnimatePresence mode='popLayout'>
+              {getVisibleItems().map((item) => {
+                const xOffset = item.position * 440; // Jarak antar card
+                return (
+                  <motion.div
+                    key={`${item.id}-${item.position}`}
+                    layout
+                    initial={{ opacity: 0, x: xOffset + 200, scale: 0.7 }}
+                    animate={{ 
+                      opacity: item.position === 0 ? 1 : 0.6,
+                      x: xOffset,
+                      scale: item.position === 0 ? 1.1 : 0.85,
+                      zIndex: item.position === 0 ? 10 : 1,
+                      filter: item.position === 0 ? 'brightness(1)' : 'brightness(0.7)'
+                    }}
+                    exit={{ opacity: 0, x: xOffset - 200, scale: 0.7 }}
+                    transition={{ duration: 0.8, ease: "easeInOut" }}
+                    className={`trip-card-landing position-${item.position}`}
+                  >
+                    <div className="card-media-wrapper">
+                      <img src={item.gambar} alt={item.nama} />
+                      <div className="cat-badge-overlay">{item.kategori}</div>
+                    </div>
+                    <div className="card-info-landing">
+                      <h3>{item.nama}</h3>
+                      <div className="meta-grid-landing">
+                        <span><i className="far fa-clock"></i> {item.durasi}</span>
+                        <span><i className="fas fa-map-marker-alt"></i> {item.lokasi}</span>
+                      </div>
+                      <div className="price-row-landing">
+                        <span className="price-label">Mulai dari</span>
+                        <span className="price-val">Rp {item.harga.toLocaleString()}</span>
+                      </div>
+                      <div className="amenities-minimal">
+                        {item.fasilitas.slice(0, 3).map((f, i) => (
+                          <span key={i}>✓ {f}</span>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          </div>
+
+          <button className="carousel-arrow carousel-arrow-left" onClick={handlePrev} aria-label="Previous">
+            <i className="fas fa-chevron-left"></i>
+          </button>
+          <button className="carousel-arrow carousel-arrow-right" onClick={handleNext} aria-label="Next">
+            <i className="fas fa-chevron-right"></i>
+          </button>
         </div>
-        <div className="luxury-grid">
-          {otherTrips.map((trip) => (
-            <div key={trip.id} className="luxury-item">
-              <div className="item-img">
-                <img src={trip.gambar} alt={trip.nama} />
-                <div className="item-price">IDR {trip.harga.toLocaleString()}</div>
-              </div>
-              <div className="item-desc">
-                <span className="cat-text">{trip.kategori}</span>
-                <h3>{trip.nama}</h3>
-                <a href="#" className="discover-link">Discover More</a>
-              </div>
-            </div>
-          ))}
+
+        <div className="view-all-wrapper">
+          
+          <Link to="/trip" className="btn-outline-gold">
+            Lihat Semua Open Trip →
+          </Link>
         </div>
       </section>
     </div>

@@ -6,7 +6,7 @@ const NAV_LINKS = [
   { name: "Beranda", path: "/" },
   { name: "Wisata", path: "/wisata" },
   { name: "Budaya", path: "/budaya" },
-  { name: "Open Trip", path: "/trip" },
+  { name: "Open Trip", path: "/opentrip" },
   { name: "Tentang Kami", path: "/about" },
   { name: "Kontak", path: "/contact" },
 ];
