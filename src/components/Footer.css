@@ -1,0 +1,236 @@
+/* ============================================================
+   src/components/Footer.css
+   Tema: Minimalist Black & Yellow — sesuai Navbar
+   ⚠️  CSS ini hanya untuk Footer, tidak menyentuh halaman lain
+   ============================================================ */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+
+.footer {
+  background: #0a0a0a;
+  color: #fff;
+  font-family: "Inter", sans-serif;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 56px 48px 28px;
+}
+@media (max-width: 768px) {
+  .footer-inner {
+    padding: 40px 24px 24px;
+  }
+}
+
+/* ── TOP ROW ───────────────────────────────────────────────── */
+.footer-top {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 56px;
+  margin-bottom: 40px;
+}
+@media (max-width: 900px) {
+  .footer-top {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+}
+
+/* ── BRAND ─────────────────────────────────────────────────── */
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  margin-bottom: 16px;
+}
+.footer-logo-img {
+  height: 30px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+.footer-logo-text {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.footer-logo-hs {
+  width: 32px;
+  height: 32px;
+  background: #f5c518;
+  color: #0a0a0a;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  flex-shrink: 0;
+}
+.footer-logo-words {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+.footer-logo-hiling {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+.footer-logo-semata {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: #f5c518;
+  letter-spacing: -0.02em;
+}
+.footer-logo-sub {
+  font-family: "Inter", sans-serif;
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.25);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.footer-tagline {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.38);
+  line-height: 1.75;
+  margin-bottom: 22px;
+}
+
+/* Kontak */
+.footer-contacts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.footer-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.38);
+}
+.footer-contact-item span:first-child {
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+/* ── LINKS ─────────────────────────────────────────────────── */
+.footer-links-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+@media (max-width: 560px) {
+  .footer-links-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.footer-link-group-title {
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.25);
+  margin-bottom: 14px;
+}
+
+.footer-link-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+  transition:
+    color 0.2s,
+    gap 0.25s;
+}
+.footer-link::before {
+  content: "";
+  display: block;
+  width: 0;
+  height: 1.5px;
+  background: #f5c518;
+  transition: width 0.25s ease;
+  flex-shrink: 0;
+  margin-right: 0;
+}
+.footer-link:hover {
+  color: #fff;
+  gap: 8px;
+}
+.footer-link:hover::before {
+  width: 12px;
+  margin-right: 0;
+}
+
+/* ── DIVIDER ───────────────────────────────────────────────── */
+.footer-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.07);
+  margin-bottom: 22px;
+}
+
+/* ── BOTTOM ────────────────────────────────────────────────── */
+.footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.footer-copy {
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.25);
+}
+.footer-copy span {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.footer-bottom-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.footer-bottom-link {
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.25);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.footer-bottom-link:hover {
+  color: #f5c518;
+}
+.footer-dot {
+  color: rgba(255, 255, 255, 0.12);
+  font-size: 12px;
+}
