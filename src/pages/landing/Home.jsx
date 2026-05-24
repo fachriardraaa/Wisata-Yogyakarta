@@ -1,5 +1,7 @@
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import axios from 'axios';
 
 // IMPORT DATA DARI SERVICE
 import { dataOpenTrip } from '../../services/data/OpenTrip';
@@ -17,6 +19,48 @@ const fadeInUp = {
 };
 
 function Home() {
+  // 1. STATE UNTUK API
+  const [apiData, setApiData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // 2. DATA MANIPULASI BIAR NYAMBUNG SAMA TEMA
+  const judulLokal = [
+    "Pesona Candi Prambanan di Pagi Hari", 
+    "Berburu Gudeg Legendaris Wijilan", 
+    "Sunset Menawan di Pantai Parangtritis", 
+    "Menjelajahi Lorong Waktu di Keraton", 
+    "Gemarlap Malam di Jalan Malioboro",
+    "Misteri dan Keindahan Gunung Merapi",
+    "Sejuknya Hutan Pinus Mangunan",
+    "Eksotisnya Gua Jomblang Gunungkidul",
+    "Belanja Batik Murah di Beringharjo",
+    "Kisah Cinta di Alun-Alun Kidul"
+  ];
+
+  // 3. FETCH API & MANIPULASI DATA
+  useEffect(() => {
+    window.scrollTo(0, 0); // Pastikan scroll di atas
+    
+    axios.get('https://jsonplaceholder.typicode.com/posts')
+      .then(res => {
+        const rawData = res.data.slice(0, 10); // Ambil 10 data
+        
+        // Sulap data bahasa Latin jadi bahasa Indonesia
+        const modifiedData = rawData.map((item, index) => ({
+            id: item.id,
+            title: judulLokal[index],
+            body: `Artikel liputan terbaru mengenai keindahan ${judulLokal[index]}. Temukan pengalaman tak terlupakan dan tips wisata terbaik hanya di Hiling Semata.`
+        }));
+
+        setApiData(modifiedData);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Gagal mengambil data API:", err);
+        setLoading(false);
+      });
+  }, []);
+
   const scrollToSection = (id) => {
     const element = document.getElementById(id);
     if (element) {
@@ -24,7 +68,6 @@ function Home() {
     }
   };
 
-  // AMBIL 2 DATA PERTAMA DARI OPEN TRIP
   const previewTrip = dataOpenTrip.slice(0, 2);
 
   return (
@@ -57,10 +100,9 @@ function Home() {
         </div>
       </div>
 
-      {/* ================= CONTENT PREVIEWS ================= */}
       <div className="max-w-7xl mx-auto px-6 py-24 space-y-40">
         
-        {/* SECTION WISATA */}
+        {/* ================= SECTION WISATA ================= */}
         <motion.section 
           id="section-wisata" 
           initial="hidden"
@@ -87,7 +129,7 @@ function Home() {
                 <div className="absolute bottom-0 left-0 p-8 w-full flex flex-col justify-end h-full">
                   <span className="text-[#c9a452] text-xs font-bold uppercase tracking-widest mb-2 drop-shadow-md">📍 {item.lokasi}</span>
                   <h4 className="text-3xl font-bold text-white mb-6 serif drop-shadow-lg">{item.judul}</h4>
-                  <Link to={`/wisata/${item.id}`} className="inline-block w-full border border-[#c9a452] text-[#c9a452] backdrop-blur-sm text-center py-3 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-[#c9a452] hover:text-[#1a1207] transition-all duration-300 shadow-[0_0_15px_rgba(201,164,82,0.2)] hover:shadow-[0_0_25px_rgba(201,164,82,0.5)]">
+                  <Link to={`/wisata/${item.id}`} className="inline-block w-full border border-[#c9a452] text-[#c9a452] backdrop-blur-sm text-center py-3 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-[#c9a452] hover:text-[#1a1207] transition-all duration-300 shadow-[0_0_15px_rgba(201,164,82,0.2)]">
                     Lihat Detail
                   </Link>
                 </div>
@@ -96,7 +138,7 @@ function Home() {
           </div>
         </motion.section>
 
-        {/* SECTION BUDAYA */}
+        {/* ================= SECTION BUDAYA ================= */}
         <motion.section 
           id="section-budaya" 
           initial="hidden"
@@ -124,7 +166,6 @@ function Home() {
                 <div className="p-6">
                   <h4 className="text-2xl font-bold text-gray-900 mb-3 serif">{item.judul}</h4>
                   <p className="text-gray-600 mb-6 text-sm leading-relaxed min-h-[40px]">{item.desc}</p>
-                  {/* LINK MENUJU DETAIL BUDAYA DINAMIS */}
                   <Link to={`/budaya/${item.id}`} className="text-[#b8963e] font-bold text-xs uppercase tracking-widest hover:underline">
                     Pelajari Sejarah →
                   </Link>
@@ -134,7 +175,7 @@ function Home() {
           </div>
         </motion.section>
 
-        {/* SECTION OPEN TRIP */}
+        {/* ================= SECTION OPEN TRIP ================= */}
         <motion.section 
           id="section-trip" 
           initial="hidden"
@@ -142,7 +183,7 @@ function Home() {
           viewport={{ once: true }}
           variants={fadeInUp}
         >
-          <div className="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-gray-200 pb-6">
+           <div className="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-gray-200 pb-6">
             <div>
               <h3 className="text-5xl font-bold text-gray-900 serif">Open Trip <span className="text-[#c9a452]">Eksklusif</span></h3>
               <p className="text-gray-600 mt-2">Agendakan petualangan kelompok terbaikmu tanpa repot bersama kami.</p>
@@ -154,48 +195,28 @@ function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {previewTrip.map((item) => (
-              <div 
-                key={item.id} 
-                className="group relative rounded-[2rem] overflow-hidden bg-white border border-gray-200/80 shadow-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(201,164,82,0.12)] hover:border-[#c9a452]"
-              >
+              <div key={item.id} className="group relative rounded-[2rem] overflow-hidden bg-white border border-gray-200/80 shadow-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(201,164,82,0.12)] hover:border-[#c9a452]">
                 <div className="flex flex-col sm:flex-row h-full">
                   <div className="sm:w-1/2 h-52 sm:h-auto overflow-hidden relative">
-                    <img 
-                      src={item.gambar} 
-                      alt={item.nama} 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
-                    />
+                    <img src={item.gambar} alt={item.nama} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                     <div className="absolute top-4 left-4 bg-orange-500 text-white px-4 py-1 text-[9px] tracking-widest uppercase font-bold rounded-full shadow-md">
                       🔥 HOT DEALS
                     </div>
                   </div>
-                  
                   <div className="sm:w-1/2 p-6 md:p-8 flex flex-col justify-between text-left bg-gradient-to-br from-white to-[#fcfaf7]">
                     <div>
-                      <span className="text-[10px] font-bold text-[#c9a452] uppercase tracking-[0.2em] mb-1 block">
-                        📍 {item.lokasi}
-                      </span>
-                      <h4 className="text-xl md:text-2xl font-bold mb-3 serif text-gray-900 line-clamp-2 leading-snug">
-                        {item.nama}
-                      </h4>
+                      <span className="text-[10px] font-bold text-[#c9a452] uppercase tracking-[0.2em] mb-1 block">📍 {item.lokasi}</span>
+                      <h4 className="text-xl md:text-2xl font-bold mb-3 serif text-gray-900 line-clamp-2 leading-snug">{item.nama}</h4>
                       <div className="text-gray-500 text-xs flex items-center gap-3 mb-4 font-medium">
-                        <span>🕒 {item.durasi}</span>
-                        <span className="text-gray-300">|</span>
-                        <span>👥 Group Tour</span>
+                        <span>🕒 {item.durasi}</span><span className="text-gray-300">|</span><span>👥 Group Tour</span>
                       </div>
                     </div>
-                    
                     <div className="pt-4 border-t border-gray-100 flex flex-col gap-3">
                       <div>
                         <small className="text-gray-400 text-[10px] uppercase tracking-widest block mb-0.5">Mulai dari</small>
-                        <div className="text-xl md:text-2xl font-bold text-[#1a1207] serif">
-                          Rp {item.harga.toLocaleString('id-ID')}
-                        </div>
+                        <div className="text-xl md:text-2xl font-bold text-[#1a1207] serif">Rp {item.harga.toLocaleString('id-ID')}</div>
                       </div>
-                      <Link 
-                        to={`/trip/${item.id}`} 
-                        className="w-full bg-[#1a1207] text-white text-center py-3 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-[#c9a452] hover:text-[#1a1207] transition-all duration-300 shadow-sm"
-                      >
+                      <Link to={`/trip/${item.id}`} className="w-full bg-[#1a1207] text-white text-center py-3 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-[#c9a452] hover:text-[#1a1207] transition-all duration-300 shadow-sm">
                         Ikut Trip →
                       </Link>
                     </div>
@@ -204,6 +225,34 @@ function Home() {
               </div>
             ))}
           </div>
+        </motion.section>
+
+        {/* ================= SECTION ARTIKEL (API) ================= */}
+        <motion.section 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeInUp}
+        >
+          <div className="flex flex-col mb-8 border-b border-gray-200 pb-4">
+            <h3 className="text-4xl font-bold text-gray-900 serif">Kabar <span className="text-[#c9a452]">Pariwisata</span></h3>
+            <p className="text-gray-600 mt-2 text-sm">Informasi terkini seputar destinasi di Yogyakarta.</p>
+          </div>
+
+          {loading ? (
+             <div className="flex justify-center items-center h-32">
+                 <p className="text-[#c9a452] font-bold animate-pulse">Memuat data dari server...</p>
+             </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+              {apiData.map((post) => (
+                <div key={post.id} className="bg-white p-5 border border-gray-200 rounded-2xl shadow-sm hover:shadow-md hover:border-[#c9a452] transition-all group">
+                  <h4 className="font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-[#c9a452] transition-colors">{post.title}</h4>
+                  <p className="text-xs text-gray-500 line-clamp-3 leading-relaxed">{post.body}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </motion.section>
 
       </div>
