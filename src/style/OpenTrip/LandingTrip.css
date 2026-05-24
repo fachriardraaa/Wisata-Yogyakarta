@@ -18,6 +18,12 @@
   text-align: center;
 }
 
+.hero-content-ex {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .hero-content-ex h1 {
   font-size: 4rem;
   font-weight: 800;
@@ -39,7 +45,7 @@
   background: #c9a84c;
   border: none;
   padding: 15px 40px;
-  border-radius: 8px;
+  border-radius: 50px;
   font-weight: 700;
   cursor: pointer;
   margin-top: 20px;
@@ -57,22 +63,23 @@
 
 .carousel-container {
   width: 100%;
-  perspective: 1000px;
+  perspective: 1200px;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 600px;
   position: relative;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .carousel-wrapper {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
   width: 100%;
   max-width: 1400px;
+  height: 100%;
 }
 
 /* Trip Card Landing */
@@ -152,6 +159,42 @@
   color: #4ade80; /* Green for checkmarks */
 }
 
+/* Carousel Arrows */
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 1.2rem;
+  cursor: pointer;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.carousel-arrow:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.7);
+  transform: translateY(-50%) scale(1.05);
+}
+
+.carousel-arrow-left {
+  left: 30px;
+}
+
+.carousel-arrow-right {
+  right: 30px;
+}
+
 .btn-outline-gold {
   background: transparent;
   border: 1px solid #c9a84c;
@@ -197,6 +240,9 @@
   }
   .position--1, .position-1 {
     display: none; /* Sembunyikan sampingan di mobile */
+  }
+  .carousel-arrow {
+    display: none;
   }
   .hero-content-ex h1 { font-size: 2.5rem; }
 }

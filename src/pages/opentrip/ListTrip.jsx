@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { dataOpenTrip } from "../../services/data/OpenTrip";
 import "../../style/OpenTrip/ListTrip.css";
+import { useEffect } from "react";
 
 // ============================================================
 // TEMPLATE HALAMAN - Ganti isi sesuai halaman masing-masing
@@ -10,12 +11,22 @@ import "../../style/OpenTrip/ListTrip.css";
 function ListTrip() {
   const navigate = useNavigate();
 
+    useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
+
   return (
     <section className="open-trip-page">
       {/* HERO */}
       <div className="open-trip-hero">
         <div className="hero-left">
-          <h1>Open Trip</h1>
+          <h1 style={{
+            fontFamily: "'Poppins', sans-serif",
+            fontWeight: 800,
+            fontSize: "3.5rem",
+            letterSpacing: "-0.02em",
+            lineHeight: 1.2,
+          }}>Open Trip</h1>
 
           <p>
             Temukan pengalaman terbaik menjelajahi
@@ -149,11 +160,11 @@ function ListTrip() {
 
       <div className="trip-content">
         <div className="trip-header-info">
-          <h1>{trip.nama}</h1>
+          <h1 style={{ fontWeight: 'bold'}}>{trip.nama}</h1>
           <span className="trip-category-tag">{trip.kategori}</span>
         </div>
 
-        <div className="trip-meta">
+        <div className="trip-meta"style={{ fontSize: 'small', margintop: '15px' }}>
           <div className="meta-item">
             <span className="meta-icon">🕒</span> {trip.durasi}
           </div>
