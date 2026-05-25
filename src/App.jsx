@@ -33,34 +33,45 @@ function App() {
   return (
     <Router>
       <Navbar />
-      <Routes>
-        {/* Landing */}
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<AboutUs />} />
-        <Route path="/contact" element={<Contact />} />
 
-        {/* Wisata */}
-        <Route path="/wisata" element={<ListWisata />} />
-        <Route path="/wisata/:id" element={<DetailWisata />} />
-        <Route path="/wisata/kategori/:kategori" element={<KategoriWisata />} />
+      {/* Membungkus Routes dengan tag <main> secara semantic.
+        minHeight digunakan agar footer tetap berada di bawah 
+        meskipun isi konten halaman sedang sedikit/kosong.
+      */}
+      <main style={{ minHeight: "80vh" }}>
+        <Routes>
+          {/* Landing */}
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/contact" element={<Contact />} />
 
-        {/* Open Trip */}
-        <Route path="/opentrip" element={<LandingTrip />} />
-        <Route path="/trip" element={<ListTrip />} />
-        <Route path="/trip/:id" element={<DetailTrip />} />
-        <Route path="/trip/booking/:id" element={<BookingTrip />} />
+          {/* Wisata */}
+          <Route path="/wisata" element={<ListWisata />} />
+          <Route path="/wisata/:id" element={<DetailWisata />} />
+          <Route
+            path="/wisata/kategori/:kategori"
+            element={<KategoriWisata />}
+          />
 
-        {/* Budaya */}
-        <Route path="/budaya" element={<ListBudaya />} />
-        <Route path="/budaya/:id" element={<DetailBudaya />} />
-        <Route path="/budaya/artikel" element={<ArtikelBudaya />} />
+          {/* Open Trip */}
+          <Route path="/opentrip" element={<LandingTrip />} />
+          <Route path="/trip" element={<ListTrip />} />
+          <Route path="/trip/:id" element={<DetailTrip />} />
+          <Route path="/trip/booking/:id" element={<BookingTrip />} />
 
-        {/* User */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/dashboard/riwayat" element={<RiwayatBooking />} />
-      </Routes>
+          {/* Budaya */}
+          <Route path="/budaya" element={<ListBudaya />} />
+          <Route path="/budaya/:id" element={<DetailBudaya />} />
+          <Route path="/budaya/artikel" element={<ArtikelBudaya />} />
+
+          {/* User */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/riwayat" element={<RiwayatBooking />} />
+        </Routes>
+      </main>
+
       <Footer />
     </Router>
   );
