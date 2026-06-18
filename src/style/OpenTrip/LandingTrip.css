@@ -7,7 +7,7 @@
 
 /* Hero Section */
 .hero-landing {
-  height: 80vh;
+  height: 700px;
   background: linear-gradient(rgba(0,0,0,0.6), #0a0a0a), 
               url('https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?q=80');
   background-size: cover;
@@ -53,12 +53,11 @@
 
 /* Carousel Section */
 .trip-carousel-section {
-  padding-top: 50px;
+  padding-top: 20px;
 }
 
 .section-title-center {
   text-align: center;
-  margin-bottom: 80px;
 }
 
 .carousel-container {
@@ -212,7 +211,7 @@
 
 .view-all-wrapper {
   text-align: center;
-  margin-top: 80px;
+  margin-top: 10px;
 }
 
 .btn-gold-action:hover {
@@ -228,6 +227,12 @@
 
 .card-media-wrapper img {
   transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.gold-text {
+  color: #c9a84c;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 27px;
 }
 
 /* Responsivitas */

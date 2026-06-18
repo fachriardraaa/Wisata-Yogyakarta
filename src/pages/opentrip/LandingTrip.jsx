@@ -28,6 +28,9 @@ const LandingTrip = () => {
     return () => clearInterval(timer);
   }, []);
   
+    useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const handlePrev = () => {
     setIndex((prev) => (prev - 1 + dataOpenTrip.length) % dataOpenTrip.length);
@@ -66,7 +69,7 @@ const LandingTrip = () => {
       <section className="trip-carousel-section">
         <div className="section-title-center">
           <span className="gold-text">OPEN TRIP TERBARU</span>
-          <h2>Open Trip Pilihan Untukmu</h2>
+        
         </div>
 
         <div className="carousel-container">
@@ -82,7 +85,7 @@ const LandingTrip = () => {
                     animate={{ 
                       opacity: item.position === 0 ? 1 : 0.6,
                       x: xOffset,
-                      scale: item.position === 0 ? 1.1 : 0.85,
+                      scale: item.position === 0 ? 0.95 : 0.80,
                       zIndex: item.position === 0 ? 10 : 1,
                       filter: item.position === 0 ? 'brightness(1)' : 'brightness(0.7)'
                     }}
