@@ -7,6 +7,22 @@ import "../../style/OpenTrip/BookingTrip.css";
 // TEMPLATE HALAMAN - Booking Trip
 // ============================================================
 
+const BOOKING_STORAGE_KEY = "bookingHistory";
+
+function safeJsonParse(value, fallback) {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return fallback;
+  }
+}
+
+function loadBookingHistory() {
+  const raw = localStorage.getItem(BOOKING_STORAGE_KEY);
+  const data = safeJsonParse(raw, []);
+  return Array.isArray(data) ? data : [];
+}
+
 function BookingTrip() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -27,7 +43,8 @@ function BookingTrip() {
 
   if (!trip) return <div className="not-found">Trip tidak ditemukan.</div>;
 
-  const totalHarga = trip.harga * formData.jumlahOrang;
+  const jumlahOrang = Number(formData.jumlahOrang || 0);
+  const totalHarga = trip.harga * jumlahOrang;
 
   // PERUBAHAN DI SINI: Menghapus tipe data React.ChangeEvent
   const handleChange = (e) => {
@@ -35,20 +52,39 @@ function BookingTrip() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleConfirm = () => {
+    // Menampilkan dialog pop-up bawaan browser
+    alert("Terima kasih! Pembayaran Anda akan segera diproses oleh admin.");
+    
+    // Setelah user klik "OK" pada pop-up, baris di bawah ini baru akan berjalan:
+    navigate('/trip');
+  };
+
   // PERUBAHAN DI SINI: Menghapus tipe data React.FormEvent
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const payload = {
+      id: `book_${Date.now()}`,
       tripId: trip.id,
       tripNama: trip.nama,
+      tanggalKeberangkatan: trip.tanggalKeberangkatan,
+      lokasi: trip.lokasi,
+      harga: trip.harga,
       ...formData,
-      totalBayar: totalHarga
+      jumlahOrang,
+      totalBayar: totalHarga,
+      status: "Menunggu",
+      createdAt: new Date().toISOString(),
     };
+
+    const history = loadBookingHistory();
+    history.unshift(payload);
+    localStorage.setItem(BOOKING_STORAGE_KEY, JSON.stringify(history));
 
     console.log("Mengirim data ke Backend:", payload);
     alert("Booking Berhasil! Kami akan menghubungi Anda via WhatsApp.");
-    navigate("/open-trip");
+    navigate("/opentrip");
   };
 
   return (
@@ -128,8 +164,14 @@ function BookingTrip() {
               </span>
             </div>
             <div className="booking-note">
-              <small>* Pembayaran akan dikonfirmasi secara manual oleh admin setelah Anda melakukan transfer.</small>
-            </div>
+            <small>* Pembayaran akan dikonfirmasi secara manual oleh admin setelah Anda melakukan transfer.</small>
+            
+            {/* Tombol OK Baru */}
+            {/* Tombol pemicu pop-up */}
+                <button onClick={handleConfirm} className="btn-ok">
+                  Konfirmasi Pembayaran
+                </button>
+          </div>
           </div>
         </div>
       </div>

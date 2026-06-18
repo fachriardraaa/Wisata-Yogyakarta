@@ -1,20 +1,47 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { dataOpenTrip } from "../../services/data/OpenTrip";
+import axios from "axios";
 import "../../style/OpenTrip/ListTrip.css";
-import { useEffect } from "react";
-
-// ============================================================
-// TEMPLATE HALAMAN - Ganti isi sesuai halaman masing-masing
-// ============================================================
 
 function ListTrip() {
+
   const navigate = useNavigate();
 
-    useEffect(() => {
-      window.scrollTo(0, 0);
-    }, []);
+  const [tripData, setTripData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+
+    window.scrollTo(0, 0);
+
+    const savedUser = JSON.parse(localStorage.getItem("user"));
+
+    if (!savedUser) {
+      navigate("/login");
+      return;
+    }
+
+    axios.get("http://localhost:3001/trips")
+      .then((res) => {
+
+        setTripData(res.data);
+
+        setLoading(false);
+
+      })
+      .catch((err) => {
+
+        console.error("Gagal mengambil data:", err);
+
+        setLoading(false);
+
+      });
+
+  }, [navigate]);
+
+  if (loading) {
+    return <h1>Loading...</h1>;
+  }
   return (
     <section className="open-trip-page">
       {/* HERO */}
@@ -131,7 +158,7 @@ function ListTrip() {
           <div className="trip-list-header">
             <p>
               Menampilkan{" "}
-              {dataOpenTrip.length} open trip
+              {tripData.length} open trip
             </p>
 
             <select>
@@ -150,32 +177,30 @@ function ListTrip() {
           </div>
 
 <div className="trip-list">
-  {dataOpenTrip.map((trip) => (
-    <div className="trip-card" key={trip.id}>
+  {tripData.map((trip) => (
+    <div className="trip-card" key={trip?.id}>
       <div className="trip-image">
-        <img src={trip.gambar} alt={trip.nama} />
+        <img src={trip?.gambar} alt={trip?.nama} />
         {/* Tambahkan Label Rating di atas Gambar */}
 
       </div>
 
       <div className="trip-content">
         <div className="trip-header-info">
-          <h1 style={{ fontWeight: 'bold'}}>{trip.nama}</h1>
-          <span className="trip-category-tag">{trip.kategori}</span>
+          <h1 style={{ fontWeight: 'bold'}}>{trip?.nama}</h1>
+          <span className="trip-category-tag">{trip?.kategori}</span>
         </div>
 
         <div className="trip-meta"style={{ fontSize: 'small', margintop: '15px' }}>
           <div className="meta-item">
-            <span className="meta-icon">🕒</span> {trip.durasi}
+            <span className="meta-icon">🕒</span> {trip?.durasi}
           </div>
           <div className="meta-item">
             <span className="meta-icon">📍</span> {trip.lokasi}
           </div>
         </div>
 
-        <p className="trip-desc">
-          {trip.deskripsiSingkat}
-        </p>
+       
 
         {/* Tambahkan Quick Highlight (Icon-icon kecil) */}
         <div className="trip-highlights">
@@ -188,7 +213,7 @@ function ListTrip() {
       <div className="trip-price-section">
         <div className="price-top">
           <small>Mulai dari</small>
-          <h3>Rp {trip.harga.toLocaleString("id-ID")}</h3>
+          <h3>Rp {trip?.harga.toLocaleString("id-ID")}</h3>
           <p>/ orang</p>
         </div>
 
@@ -196,17 +221,17 @@ function ListTrip() {
           <div className="progress-bar">
             <div 
               className="progress-fill" 
-              style={{ width: `${(trip.kuotaTersisa/trip.kuota)*100}%` }}
+              style={{ width: `${(trip?.kuotaTersisa/trip?.kuota)*100}%` }}
             ></div>
           </div>
           <p className="kuota-text">
-            <span>{trip.kuotaTersisa} Kursi</span> tersisa
+            <span>{trip?.kuotaTersisa} Kursi</span> tersisa
           </p>
         </div>
 
         <button 
           className="btn-detail-main"
-          onClick={() => navigate(`/trip/${trip.id}`)}
+          onClick={() => navigate(`/trip/${trip?.id}`)}
         >
           Lihat Detail
         </button>
