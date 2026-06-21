@@ -25,7 +25,7 @@ proyek-hiling-semata/
 ==================================================================
 1.  Kloning Repositori
     git clone <URL_REPOSITORY_GITHUB_ANDA>
-    cd proyek-hiling-semata
+    cd hiling-semata
 
 2.  Setup & Jalankan Backend (Server)
     Masuk ke dalam direktori backend:
@@ -37,20 +37,20 @@ proyek-hiling-semata/
     npm install
     Buat database baru bernama hiling_semata di phpMyAdmin (atau aplikasi GUI database pilihan Anda).
 
-    cp .env.example .env
-    Buka file .env tersebut dan sesuaikan kredensial username serta password MySQL lokal Anda.
-
+    Bash
     npx knex migrate:latest
     Jalankan Knex Seeder untuk mengisi tabel wisata dengan data siap pakai secara otomatis:
 
+    Bash
     npx knex seed:run
     Nyalakan server backend dalam mode pengembangan (development):
 
-    npm run dev
+    Bash
+    node server.js
     Server backend Anda kini berjalan responsif di URL http://localhost:3001
 
 3.  Setup & Jalankan Frontend (Client)
-    Buka jendela terminal baru, lalu masuk ke direktori frontend:
+    Buka jendela gitbash baru, lalu masuk ke direktori frontend:
 
     cd frontend
     Install seluruh dependensi library frontend:

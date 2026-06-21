@@ -70,27 +70,22 @@ exports.seed = async function(knex) {
   await knex('open_trip_fasilitas').insert([
     // Fasilitas Trip ID 1
     { trip_id: 1, fasilitas: "Hotel Bintang 3" },
-    { trip_id: 1, fasilitas: "Transportasi AC" },
     { trip_id: 1, fasilitas: "Makan 7x" },
     { trip_id: 1, fasilitas: "Tiket Wisata" },
-    { trip_id: 1, fasilitas: "Guide" },
     
     // Fasilitas Trip ID 3
     { trip_id: 3, fasilitas: "Transport" },
-    { trip_id: 3, fasilitas: "Tiket Terusan" },
     { trip_id: 3, fasilitas: "Guide" },
     { trip_id: 3, fasilitas: "Dinner" },
 
     // Fasilitas Trip ID 5
     { trip_id: 5, fasilitas: "Hotel Bintang 3" },
     { trip_id: 5, fasilitas: "Jeep Timang" },
-    { trip_id: 5, fasilitas: "Gondola Ticket" },
     { trip_id: 5, fasilitas: "Makan 4x" },
 
     // Fasilitas Trip ID 8
     { trip_id: 8, fasilitas: "Hotel Bintang 3" },
     { trip_id: 8, fasilitas: "Transport" },
-    { trip_id: 8, fasilitas: "Tiket Museum" },
     { trip_id: 8, fasilitas: "Makan 4x" }
   ]);
 
