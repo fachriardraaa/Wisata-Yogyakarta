@@ -1,16 +1,61 @@
-# React + Vite
+# Hiling Semata - Aplikasi Booking Open Trip 🏖️
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplikasi marketplace platform penyedia paket wisata (*Open Trip*) dinamis berbasis web. Dibangun menggunakan ekosistem **React.js** di sisi frontend, serta **Express.js**, **Knex.js (Migration & Seeding)**, dan **MySQL** di sisi backend.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🛠️ Tech Stack & Fitur Utama
+- **Frontend:** React.js, React Router DOM, Axios untuk integrasi API.
+- **Backend:** Express.js, CORS, Dotenv.
+- **Database & Lifecycle:** MySQL dengan driver `mysql2`, Knex.js untuk *Database Migration* (pembuatan skema tabel otomatis) dan *Database Seeding* (pengisian data tiruan awal).
+- **Fitur Otomatisasi Kuota:** Sistem *Database Transaction* pada backend yang otomatis memotong sisa kuota perjalanan saat pemesanan (*booking*) berhasil divalidasi.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 📁 Struktur Repositori
+```text
+proyek-hiling-semata/
+├── backend/          # Source code server Express & konfigurasi Knex
+├── frontend/         # Source code UI aplikasi React
+└── README.md         # Dokumentasi panduan instalasi (File ini)
 
-## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+==================================================================
+                !!!PALING PENTING!!!
+==================================================================
+1.  Kloning Repositori
+    git clone <URL_REPOSITORY_GITHUB_ANDA>
+    cd proyek-hiling-semata
+
+2.  Setup & Jalankan Backend (Server)
+    Masuk ke dalam direktori backend:
+
+    cd backend
+    Install seluruh dependensi node modules yang dibutuhkan:
+
+    Bash
+    npm install
+    Buat database baru bernama hiling_semata di phpMyAdmin (atau aplikasi GUI database pilihan Anda).
+
+    cp .env.example .env
+    Buka file .env tersebut dan sesuaikan kredensial username serta password MySQL lokal Anda.
+
+    npx knex migrate:latest
+    Jalankan Knex Seeder untuk mengisi tabel wisata dengan data siap pakai secara otomatis:
+
+    npx knex seed:run
+    Nyalakan server backend dalam mode pengembangan (development):
+
+    npm run dev
+    Server backend Anda kini berjalan responsif di URL http://localhost:3001
+
+3.  Setup & Jalankan Frontend (Client)
+    Buka jendela terminal baru, lalu masuk ke direktori frontend:
+
+    cd frontend
+    Install seluruh dependensi library frontend:
+
+    npm install
+    Jalankan aplikasi frontend React Anda:
+
+    npm run dev
