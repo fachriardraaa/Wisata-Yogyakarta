@@ -149,6 +149,55 @@ app.post("/booking", (req, res) => {
   });
 });
 
+app.post("/register", (req, res) => {
+  const { name, email, phone, password } = req.body;
+
+  if (!name || !email || !phone || !password) {
+    return res.status(400).json({ message: "Semua data wajib diisi!" });
+  }
+
+  const sqlCheckEmail = `SELECT * FROM users WHERE email = ?`;
+  db.query(sqlCheckEmail, [email], (err, results) => {
+    if (err) return res.status(500).json({ message: "Gagal memeriksa email" });
+
+    if (results.length > 0) {
+      return res.status(400).json({ message: "Email sudah terdaftar. Silakan gunakan email lain." });
+    }
+
+    const sqlInsertUser = `
+      INSERT INTO users ( name, email, phone, password)
+      VALUES ( ?, ?, ?, ?)
+    `;
+    db.query(sqlInsertUser, [name, email, phone, password], (err, result) => {
+      if (err) return res.status(500).json({ message: "Gagal menyimpan data pengguna" });
+
+      res.status(201).json({ message: "Pendaftaran berhasil! Silakan login." });
+    });
+  });
+});
+
+app.post("/login", (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: "Email dan kata sandi wajib diisi!" });
+  }
+
+  const sqlCheckUser = `SELECT * FROM users WHERE email = ? AND password = ?`;
+  db.query(sqlCheckUser, [email, password], (err, results) => {
+    if (err) return res.status(500).json({ message: "Gagal memeriksa kredensial" });
+
+    if (results.length === 0) {
+      return res.status(401).json({ message: "Email atau kata sandi salah." });
+    }
+
+    const user = results[0];
+    delete user.password; // Hapus password dari respons
+
+    res.json({ message: "Login berhasil!", user });
+  });
+});
+
 app.listen(3001, () => {
   console.log("Server running on port 3001");
 });

@@ -1,155 +1,301 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import "../../style/User/login.css";
 
-const USERS_STORAGE_KEY = "users";
-
-function safeJsonParse(value, fallback) {
-  try {
-    return JSON.parse(value);
-  } catch {
-    return fallback;
-  }
-}
-
-function loadUsers() {
-  const raw = localStorage.getItem(USERS_STORAGE_KEY);
-  const data = safeJsonParse(raw, []);
-  return Array.isArray(data) ? data : [];
-}
 
 function Login() {
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("error");
+
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+
+  const handleLogin = async (e) => {
+
     e.preventDefault();
 
-    const users = loadUsers();
-    const match = users.find(
-      (u) => String(u?.email || "").toLowerCase() === String(email).toLowerCase()
-    );
 
-    const fallbackName = String(email || "User").includes("@")
-      ? String(email).split("@")[0]
-      : "User";
+    try {
 
-    // Simulasi login berhasil (tanpa backend)
-    const userData = match
-      ? match
-      : {
-          id: `usr_${Date.now()}`,
-          name: fallbackName,
-          email: email,
-          avatar: null,
-          createdAt: new Date().toISOString(),
-        };
+      const res = await axios.post(
+        "http://localhost:3001/login",
+        {
+          email,
+          password
+        }
+      );
 
-    // Simpan ke localStorage agar Navbar bisa mendeteksi status login
-    localStorage.setItem("user", JSON.stringify(userData));
 
-    // Arahkan ke dashboard setelah login
-    navigate("/dashboard");
+      // simpan user yang login
+      localStorage.setItem(
+        "user",
+        JSON.stringify(res.data.user)
+      );
+
+
+      setMessage("Login berhasil");
+      setMessageType("success");
+
+
+      // pindah halaman
+      navigate("/");
+
+
+    } catch (err) {
+
+
+      if(err.response){
+
+        setMessage(
+          err.response.data.message
+        );
+
+      }else{
+
+        setMessage(
+          "Server tidak terhubung"
+        );
+
+      }
+
+
+      setMessageType("error");
+
+    }
+
   };
 
+
+
   return (
+
     <div className="authPage">
+
       <div className="authShell">
-        <div className="authHero" role="region" aria-label="Login">
+
+        <div className="authHero">
+
+
           <div className="authGlass">
+
+
             <div className="authCopy">
-              <h1 className="authHeading">Selamat Datang</h1>
+
+              <h1 className="authHeading">
+                Selamat Datang
+              </h1>
+
+
               <p className="authSubheading">
                 Masuk untuk merencanakan petualanganmu di Yogyakarta.
               </p>
+
+
             </div>
 
-            <form onSubmit={handleLogin} className="authForm">
+
+
+            <form 
+              onSubmit={handleLogin}
+              className="authForm"
+            >
+
+
               <div className="authField">
-                <label className="authLabel" htmlFor="email">
+
+
+                <label className="authLabel">
                   Email
                 </label>
+
+
                 <input
+
                   className="authInput"
+
                   type="email"
-                  id="email"
-                  name="email"
+
                   placeholder="Masukkan email"
-                  autoComplete="email"
+
                   required
+
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+
+                  onChange={(e)=>{
+
+                    setEmail(e.target.value);
+
+                    setMessage("");
+
+                  }}
+
                 />
+
+
               </div>
+
+
+
 
               <div className="authField">
-                <label className="authLabel" htmlFor="password">
+
+
+                <label className="authLabel">
                   Kata sandi
                 </label>
+
+
                 <div className="authInputWrap">
+
+
                   <input
+
                     className="authInput authInputWithToggle"
-                    type={showPassword ? "text" : "password"}
-                    id="password"
-                    name="password"
+
+                    type={
+                      showPassword
+                      ?
+                      "text"
+                      :
+                      "password"
+                    }
+
+
                     placeholder="Masukkan kata sandi"
-                    autoComplete="current-password"
+
                     required
+
+
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+
+
+                    onChange={(e)=>{
+
+                      setPassword(e.target.value);
+
+                      setMessage("");
+
+                    }}
+
                   />
+
+
+
                   <button
+
                     type="button"
+
                     className="authToggleBtn"
-                    onClick={() => setShowPassword((value) => !value)}
-                    aria-pressed={showPassword}
-                    aria-label={showPassword ? "Sembunyikan kata sandi" : "Lihat kata sandi"}
+
+                    onClick={()=>setShowPassword(!showPassword)}
+
                   >
-                    {showPassword ? "Sembunyi" : "Lihat"}
+
+                    {
+                      showPassword
+                      ?
+                      "Sembunyi"
+                      :
+                      "Lihat"
+                    }
+
+
                   </button>
+
+
                 </div>
+
+
               </div>
 
-              <div className="authHelpRow">
-                <button
-                  type="button"
-                  className="authForgot"
-                  onClick={() => {
-                    // placeholder aksi
-                  }}
+
+
+
+              {
+                message &&
+
+                <div
+
+                  className={
+                    messageType==="success"
+                    ?
+                    "authMessage authMessageSuccess"
+                    :
+                    "authMessage authMessageError"
+                  }
+
                 >
-                  Lupa sandi?
-                </button>
-              </div>
 
-              <button type="submit" className="authPrimaryBtn">
+                  {message}
+
+                </div>
+
+              }
+
+
+
+
+              <button
+
+                type="submit"
+
+                className="authPrimaryBtn"
+
+              >
+
                 Masuk
+
               </button>
 
-              <div className="authDivider" aria-hidden="true">
-                <span className="authDividerLine" />
-                <span className="authDividerText">OR</span>
-                <span className="authDividerLine" />
+
+
+
+              <div className="authBottomText">
+
+
+                <span>
+                  Belum punya akun?
+                </span>
+
+
+                <Link 
+                  to="/register"
+                  className="authBottomLink"
+                >
+
+                  Daftar
+
+                </Link>
+
+
               </div>
 
-              <button type="button" className="authGoogleBtn">
-                Masuk dengan Google
-              </button>
+
+
             </form>
 
-            <div className="authBottomText">
-              <span>Belum punya akun?</span>
-              <Link to="/register" className="authBottomLink">
-                Daftar
-              </Link>
-            </div>
+
+
           </div>
+
+
         </div>
+
+
       </div>
+
+
     </div>
+
   );
+
 }
+
 
 export default Login;

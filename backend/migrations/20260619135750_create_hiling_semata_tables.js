@@ -52,8 +52,42 @@ exports.up = function(knex) {
       table.string('nomor_whatsapp', 20).notNullable();
       table.integer('jumlah_peserta').notNullable();
       table.integer('total_bayar').notNullable();
+          table.enum('status', [
+      'pending',
+      'confirmed',
+      'completed',
+      'cancelled'
+    ]);
       table.timestamp('tanggal_booking').defaultTo(knex.fn.now()); // Otomatis terisi waktu saat ini
-    });
+    })
+
+    // 5. TABEL USER : Login dan Register
+    .createTable('users', (table) => {
+        table.increments('id').primary();
+      table.string('name', 100).notNullable();
+      table.string('email', 100).notNullable().unique();
+      table.string('phone', 20).notNullable();
+      table.string('password', 255).notNullable();
+      table.text('avatar').nullable();
+      table.timestamp('created_at').notNullable().defaultTo(knex.fn.now());
+    })
+    
+   // Booking User
+    .createTable('booking_users',(table)=>{
+  table.increments('id').primary();
+  table.integer('booking_id')
+    .unsigned()
+    .notNullable()
+    .references('id')
+    .inTable('open_trip_booking')
+    .onDelete('CASCADE');
+  table.integer('user_id')
+    .unsigned()
+    .notNullable()
+    .references('id')
+    .inTable('users')
+    .onDelete('CASCADE');
+});
 };
 
 /**
@@ -63,9 +97,24 @@ exports.up = function(knex) {
 exports.down = function(knex) {
   // Proses menghapus tabel harus dibalik (hapus tabel anak dulu, baru tabel utama)
   // agar tidak melanggar aturan Foreign Key Constraint
+  exports.down = function(knex) {
   return knex.schema
+
+    // tabel relasi many-to-many
+    .dropTableIfExists('booking_users')
+
+    // tabel booking
     .dropTableIfExists('open_trip_booking')
+
+    // tabel anak open_trip
     .dropTableIfExists('open_trip_galeri')
+
     .dropTableIfExists('open_trip_fasilitas')
-    .dropTableIfExists('open_trip');
+
+    // tabel utama
+    .dropTableIfExists('open_trip')
+
+    // tabel user
+    .dropTableIfExists('users');
+  }
 };

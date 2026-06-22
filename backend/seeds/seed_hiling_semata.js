@@ -5,10 +5,24 @@
 exports.seed = async function(knex) {
   // 1. Bersihkan semua data lama di tabel anak terlebih dahulu, baru tabel utama
   // Ini penting agar tidak memicu error Foreign Key Integrity saat seed dijalankan ulang
+  await knex('booking_users').del();
   await knex('open_trip_booking').del();
   await knex('open_trip_galeri').del();
   await knex('open_trip_fasilitas').del();
   await knex('open_trip').del();
+  await knex('users').del();
+
+ await knex('users').insert([
+    {
+      id: '1',
+      name: 'John Admin',
+      email: 'admin@google.com',
+      phone: '081234567890',
+      password: 'admin', // Dalam produksi, pastikan untuk menyimpan hash password, bukan plaintext
+      avatar: null,
+      created_at: knex.fn.now()
+    }
+  ])
 
   // 2. MASUKKAN DATA UTAMA KE TABEL: open_trip
   await knex('open_trip').insert([
@@ -110,5 +124,35 @@ exports.seed = async function(knex) {
     { trip_id: 8, gambar: "https://www.wsrentaljogja.com/wp-content/uploads/2017/08/@malioboro_insta.jpg" },
     { trip_id: 8, gambar: "https://bakpiakukustugu.co.id/uploads/compress/861257c278a9f67d3343e3b8ff4532ae.webp" },
     { trip_id: 8, gambar: "https://perkim.id/wp-content/uploads/2024/11/Suasana-Kawasan-Prawirotaman-%E2%80%9CKampung-Bule%E2%80%9D-Yogyakarta.jpg" }
+  ])
+
+  await knex('open_trip_booking').insert([
+
+    {
+      id:1,
+      trip_id:1,
+      jumlah_peserta:2,
+      total_bayar:500000,
+      status:'pending'
+    },
+
+  ]);await knex('open_trip_booking').insert([
+
+    {
+      trip_id:1,
+      jumlah_peserta:2,
+      total_bayar:500000,
+      status:'pending'
+    },
+
+  ]);
+ 
+
+  await knex('booking_users').insert([
+
+  {
+      booking_id:1,
+      user_id:1
+    },
   ]);
 };

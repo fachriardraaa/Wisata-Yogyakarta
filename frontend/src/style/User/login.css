@@ -138,6 +138,27 @@
 	justify-content: flex-end;
 }
 
+.authMessage {
+	padding: 12px 14px;
+	border-radius: 12px;
+	font-size: 0.875rem;
+	font-weight: 600;
+	line-height: 1.4;
+	border: 1px solid transparent;
+}
+
+.authMessageError {
+	background: rgba(239, 68, 68, 0.12);
+	border-color: rgba(239, 68, 68, 0.3);
+	color: #991b1b;
+}
+
+.authMessageSuccess {
+	background: rgba(5, 150, 105, 0.12);
+	border-color: rgba(5, 150, 105, 0.3);
+	color: #065f46;
+}
+
 .authForgot {
 	background: transparent;
 	border: 0;

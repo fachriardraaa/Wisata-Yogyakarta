@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import "../../style/User/register.css";
 
 const USERS_STORAGE_KEY = "users";
@@ -30,34 +31,69 @@ function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (password !== confirmPassword) {
-      alert("Konfirmasi kata sandi tidak sama.");
-      return;
-    }
 
-    const newUser = {
-      id: `usr_${Date.now()}`,
-      name: fullName.trim() || "User",
-      email: email.trim(),
-      phone: phone.trim(),
-      avatar: null,
-      createdAt: new Date().toISOString(),
-    };
+  if (password !== confirmPassword) {
+    alert("Konfirmasi kata sandi tidak sama.");
+    return;
+  }
 
-    const users = loadUsers();
-    const nextUsers = users.filter(
-      (u) => String(u?.email || "").toLowerCase() !== String(newUser.email).toLowerCase()
-    );
-    nextUsers.unshift(newUser);
-    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(nextUsers));
 
-    // set current session user
-    localStorage.setItem("user", JSON.stringify(newUser));
-    navigate("/dashboard");
+  const newUser = {
+    name: fullName.trim() || "User",
+    email: email.trim(),
+    phone: phone.trim(),
+    password,
   };
+
+
+  try {
+
+
+    const response = await axios.post(
+      "http://localhost:3001/register",
+      newUser
+    );
+
+
+    console.log(response.data);
+
+
+    // simpan sesi user tanpa password
+    const sessionUser = { ...newUser };
+
+    delete sessionUser.password;
+
+
+    localStorage.setItem(
+      "user",
+      JSON.stringify(sessionUser)
+    );
+
+
+    alert("Registrasi berhasil");
+
+
+    navigate("/login");
+
+
+
+  } catch(error){
+
+    console.log(error.response);
+
+
+    alert(
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      "Terjadi kesalahan pada server"
+    );
+
+}
+
+};
 
   return (
     <div className="registerPage">
