@@ -35,7 +35,9 @@ proyek-hiling-semata/
 
     Bash
     npm install
+    
     Buat database baru bernama hiling_semata di phpMyAdmin (atau aplikasi GUI database pilihan Anda).
+    pastikan database hiling_semata tidak ada tabel didalamnya
 
     Bash
     npx knex migrate:latest

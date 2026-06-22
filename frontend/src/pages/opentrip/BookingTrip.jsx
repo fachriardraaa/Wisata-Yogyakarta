@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { dataOpenTrip } from "../../services/data/OpenTrip";
+import axios from "axios";
 import "../../style/OpenTrip/BookingTrip.css";
 
 // ============================================================
@@ -26,9 +26,12 @@ function loadBookingHistory() {
 function BookingTrip() {
   const { id } = useParams();
   const navigate = useNavigate();
-  
-  // Mencari data trip berdasarkan ID
-  const trip = dataOpenTrip.find((t) => t.id === id);
+  const [trip, setTrip] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [nama_lengkap, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [nomorWa, setNomorWa] = useState("");
+  const [jumlahPeserta, setJumlahPeserta] = useState("");
 
   const [formData, setFormData] = useState({
     namaLengkap: "",
@@ -39,6 +42,16 @@ function BookingTrip() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+
+      axios.get(`http://localhost:3001/trips/${id}`)
+      .then((res) => {
+        setTrip(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Gagal mengambil data detail trip:", err);
+        setLoading(false);
+      });
   }, []);
 
   if (!trip) return <div className="not-found">Trip tidak ditemukan.</div>;
@@ -46,13 +59,16 @@ function BookingTrip() {
   const jumlahOrang = Number(formData.jumlahOrang || 0);
   const totalHarga = trip.harga * jumlahOrang;
 
+
   // PERUBAHAN DI SINI: Menghapus tipe data React.ChangeEvent
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  
   const handleConfirm = () => {
+   
     // Menampilkan dialog pop-up bawaan browser
     alert("Terima kasih! Pembayaran Anda akan segera diproses oleh admin.");
     
@@ -61,31 +77,49 @@ function BookingTrip() {
   };
 
   // PERUBAHAN DI SINI: Menghapus tipe data React.FormEvent
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    const payload = {
-      id: `book_${Date.now()}`,
-      tripId: trip.id,
-      tripNama: trip.nama,
-      tanggalKeberangkatan: trip.tanggalKeberangkatan,
-      lokasi: trip.lokasi,
-      harga: trip.harga,
-      ...formData,
-      jumlahOrang,
-      totalBayar: totalHarga,
-      status: "Menunggu",
-      createdAt: new Date().toISOString(),
-    };
+  // 1. Validasi awal di frontend (Satu lapis pengaman sebelum dikirim ke backend)
+  const sisaKuota = trip.kuota_tersisa || trip.kuotaTersisa;
+  if (jumlahOrang > sisaKuota) {
+    alert(`Jumlah peserta melebihi kuota yang tersedia. Sisa kursi: ${sisaKuota} pax.`);
+    return; // Stop eksekusi jika kuota tidak cukup
+  }
 
-    const history = loadBookingHistory();
-    history.unshift(payload);
-    localStorage.setItem(BOOKING_STORAGE_KEY, JSON.stringify(history));
-
-    console.log("Mengirim data ke Backend:", payload);
-    alert("Booking Berhasil! Kami akan menghubungi Anda via WhatsApp.");
-    navigate("/opentrip");
+  // 2. Bungkus data sesuai dengan struktur objek yang diminta oleh backend Express (Route 3)
+  const payload = {
+    trip_id: trip.id,
+    nama_lengkap: formData.namaLengkap,
+    email: formData.email,
+    nomor_whatsapp: formData.nomorWa,
+    jumlah_peserta: jumlahOrang,
+    total_bayar: totalHarga,
   };
+
+  try {
+    console.log("Mengirim data ke Backend:", payload);
+    
+    // 3. Tembak API backend menggunakan Axios POST
+    const response = await axios.post("http://localhost:3001/booking", payload);
+    
+    // Jika backend berhasil menyimpan data ke DB & mengembalikan status 201
+    alert(response.data.message); 
+    
+    // 4. Alihkan halaman ke daftar trip setelah sukses booking
+    navigate("/opentrip"); 
+    
+  } catch (error) {
+    console.error("Gagal melakukan proses booking ke DB:", error);
+    
+    // Menangkap pesan error spesifik jika terjadi penolakan kuota dari backend
+    if (error.response && error.response.data) {
+      alert(`Gagal Booking: ${error.response.data.message}`);
+    } else {
+      alert("Terjadi gangguan pada server database. Silakan coba lagi nanti.");
+    }
+  }
+};
 
   return (
     <section className="booking-page">

@@ -5,7 +5,7 @@ const LINKS = {
   Jelajahi: [
     { name: "Wisata", path: "/wisata" },
     { name: "Budaya", path: "/budaya" },
-    { name: "Open Trip", path: "/trip" },
+    { name: "Open Trip", path: "/opentrip" },
     { name: "Artikel Budaya", path: "/budaya/artikel" },
   ],
 
