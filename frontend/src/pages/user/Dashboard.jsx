@@ -1,13 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { dataOpenTrip } from "../../services/data/OpenTrip";
+import api from "../../services/api";
 import "../../style/User/dashboard.css";
-
-const BOOKING_STORAGE_KEY = "bookingHistory";
-
-const TRIP_BY_ID = new Map(
-  (Array.isArray(dataOpenTrip) ? dataOpenTrip : []).map((t) => [String(t.id), t])
-);
 
 function formatRupiah(value) {
   const numberValue = Number(value || 0);
@@ -24,12 +18,6 @@ function safeJsonParse(value, fallback) {
   } catch {
     return fallback;
   }
-}
-
-function loadBookingHistory() {
-  const raw = localStorage.getItem(BOOKING_STORAGE_KEY);
-  const data = safeJsonParse(raw, []);
-  return Array.isArray(data) ? data : [];
 }
 
 function calcDaysSince(isoDateString) {
@@ -93,41 +81,34 @@ function addDays(date, days) {
 
 function getTripDate(booking) {
   const rawFromBooking = booking?.tanggalKeberangkatan;
-  const tripId = booking?.tripId != null ? String(booking.tripId) : null;
-  const fallback = tripId ? TRIP_BY_ID.get(tripId) : null;
-  const raw = rawFromBooking || fallback?.tanggalKeberangkatan;
-  if (!raw) return null;
-  return parseDateOnly(raw);
+  if (!rawFromBooking) return null;
+  return parseDateOnly(rawFromBooking);
 }
 
 function getTripLokasi(booking) {
-  const rawFromBooking = booking?.lokasi;
-  const tripId = booking?.tripId != null ? String(booking.tripId) : null;
-  const fallback = tripId ? TRIP_BY_ID.get(tripId) : null;
-  return rawFromBooking || fallback?.lokasi || "";
+  return booking?.lokasi || "";
 }
 
 function deriveTripStatus(booking) {
   const rawStatus = String(booking?.status || "");
   const normalized = rawStatus.toLowerCase();
-  if (normalized.includes("batal")) return "Dibatalkan";
+  if (normalized.includes("batal") || normalized.includes("cancel")) return "Dibatalkan";
+  if (normalized.includes("selesai") || normalized.includes("completed")) return "Selesai";
+  if (normalized.includes("terjalani") || normalized.includes("confirm") || normalized.includes("jalan") || normalized.includes("running") || normalized.includes("berlangsung")) {
+    return "Terjalani";
+  }
+  if (normalized.includes("pending") || normalized.length === 0) return "Pending";
 
   const tripDate = getTripDate(booking);
   if (tripDate) {
     const tripKey = toDateKey(tripDate);
     const todayKey = toDateKey(new Date());
     if (tripKey < todayKey) return "Selesai";
-    if (tripKey === todayKey) return "Berlangsung";
-    return "Terjadwal";
+    if (tripKey === todayKey) return "Terjalani";
+    return "Pending";
   }
 
-  if (normalized.includes("selesai") || normalized.includes("ended") || normalized.includes("completed")) {
-    return "Selesai";
-  }
-  if (normalized.includes("jalan") || normalized.includes("berlangsung") || normalized.includes("running")) {
-    return "Berlangsung";
-  }
-  return rawStatus || "Menunggu";
+  return "Pending";
 }
 
 function intensityClass(count) {
@@ -142,6 +123,8 @@ function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [bookings, setBookings] = useState([]);
+  const [bookingsLoading, setBookingsLoading] = useState(true);
+  const [cancellingBookingId, setCancellingBookingId] = useState(null);
   const [search, setSearch] = useState("");
   const [nowTick, setNowTick] = useState(() => Date.now());
 
@@ -163,8 +146,42 @@ function Dashboard() {
       localStorage.setItem("user", JSON.stringify(hydratedUser));
     }
     setUser(hydratedUser);
-    setBookings(loadBookingHistory());
   }, [navigate]);
+
+  useEffect(() => {
+    let isActive = true;
+
+    async function loadBookings() {
+      if (!user?.email) {
+        setBookings([]);
+        setBookingsLoading(false);
+        return;
+      }
+
+      setBookingsLoading(true);
+
+      try {
+        const response = await api.get("/bookings", {
+          params: { email: user.email },
+        });
+
+        if (!isActive) return;
+        setBookings(Array.isArray(response.data) ? response.data : []);
+      } catch (error) {
+        console.error("Gagal mengambil data booking:", error);
+        if (!isActive) return;
+        setBookings([]);
+      } finally {
+        if (isActive) setBookingsLoading(false);
+      }
+    }
+
+    loadBookings();
+
+    return () => {
+      isActive = false;
+    };
+  }, [user?.email]);
 
   useEffect(() => {
     const id = window.setInterval(() => setNowTick(Date.now()), 1000);
@@ -207,17 +224,17 @@ function Dashboard() {
   }, [userBookings]);
 
   const statusCounts = useMemo(() => {
-    let ended = 0;
+    let pending = 0;
     let running = 0;
     let cancelled = 0;
-    let pending = 0;
+    let ended = 0;
 
     for (const item of userBookings) {
       const s = deriveTripStatus(item);
-      if (s === "Dibatalkan") cancelled += 1;
+      if (s === "Pending") pending += 1;
+      else if (s === "Terjalani") running += 1;
+      else if (s === "Dibatalkan") cancelled += 1;
       else if (s === "Selesai") ended += 1;
-      else if (s === "Berlangsung") running += 1;
-      else pending += 1;
     }
 
     return { ended, running, cancelled, pending };
@@ -268,18 +285,24 @@ function Dashboard() {
     );
   }, [recentBookings, search]);
 
-  const completedTripsNewest = useMemo(() => {
+  const historyBookings = useMemo(() => {
+    return [...userBookings].sort((a, b) => {
+      const nameCompare = String(a?.tripNama || "").localeCompare(String(b?.tripNama || ""), "id");
+      if (nameCompare !== 0) return nameCompare;
+
+      const dateA = new Date(a?.tanggalKeberangkatan || a?.createdAt || 0).getTime();
+      const dateB = new Date(b?.tanggalKeberangkatan || b?.createdAt || 0).getTime();
+      if (dateB !== dateA) return dateB - dateA;
+
+      return String(b?.id || "").localeCompare(String(a?.id || ""), "id");
+    });
+  }, [userBookings]);
+
+  const cancelableBookings = useMemo(() => {
     return bookingsNewest
-      .filter((b) => deriveTripStatus(b) === "Selesai")
-      .sort((a, b) => {
-        const da = getTripDate(a);
-        const db = getTripDate(b);
-        const ta = da ? da.getTime() : 0;
-        const tb = db ? db.getTime() : 0;
-        if (tb !== ta) return tb - ta;
-        return (
-          new Date(b?.createdAt || 0).getTime() - new Date(a?.createdAt || 0).getTime()
-        );
+      .filter((b) => {
+        const status = deriveTripStatus(b);
+        return status === "Pending" || status === "Terjalani";
       })
       .slice(0, 4);
   }, [bookingsNewest]);
@@ -313,9 +336,33 @@ function Dashboard() {
   const accountElapsed = user?.createdAt
     ? formatElapsed(nowTick - new Date(user.createdAt).getTime())
     : "00:00:00";
-  const progressPercent = summary.totalTrip
-    ? Math.round((statusCounts.ended / summary.totalTrip) * 100)
-    : 0;
+
+  async function handleCancelBooking(bookingId, bookingName) {
+    const ok = window.confirm(`Batalkan booking "${bookingName}"?`);
+    if (!ok) return;
+
+    setCancellingBookingId(bookingId);
+    try {
+      await api.patch(`/bookings/${bookingId}/cancel`, {
+        email: user.email,
+      });
+
+      setBookings((current) =>
+        current.map((item) =>
+          String(item.id) === String(bookingId)
+            ? { ...item, status: "cancelled" }
+            : item
+        )
+      );
+    } catch (error) {
+      console.error("Gagal membatalkan booking:", error);
+      alert(
+        error?.response?.data?.message || "Gagal membatalkan booking, silakan coba lagi."
+      );
+    } finally {
+      setCancellingBookingId(null);
+    }
+  }
 
   const monthTitle = useMemo(() => {
     const d = new Date(calendarYear, calendarMonth, 1);
@@ -433,9 +480,9 @@ function Dashboard() {
             <div className="dash-statPrimary">
               <div className="dash-cardHead">
                 <div>
-                  <p className="dash-statLabelPrimary">Total Projects</p>
+                  <p className="dash-statLabelPrimary">Total Booking</p>
                   <p className="dash-statValuePrimary">{summary.totalTrip}</p>
-                  <p className="dash-statSubPrimary">total trip</p>
+                  <p className="dash-statSubPrimary">total booking</p>
                 </div>
                 <div className="dash-statIconPrimary">↗</div>
               </div>
@@ -444,10 +491,10 @@ function Dashboard() {
             <div className="dash-statCard">
               <div className="dash-cardHead">
                 <div>
-                  <p className="dash-statLabel">Ended Projects</p>
-                  <p className="dash-statValue">{statusCounts.ended}</p>
-                  <p className="dash-statSub">trip tlh diikuti</p>
-                  <p className="dash-statNote">increased from last month</p>
+                  <p className="dash-statLabel">Pending Booking</p>
+                  <p className="dash-statValue">{statusCounts.pending}</p>
+                  <p className="dash-statSub">menunggu konfirmasi</p>
+                  <p className="dash-statNote">booking baru</p>
                 </div>
                 <div className="dash-statIcon">↗</div>
               </div>
@@ -456,10 +503,10 @@ function Dashboard() {
             <div className="dash-statCard">
               <div className="dash-cardHead">
                 <div>
-                  <p className="dash-statLabel">Running Projects</p>
+                  <p className="dash-statLabel">Terjalani Booking</p>
                   <p className="dash-statValue">{statusCounts.running}</p>
-                  <p className="dash-statSub">trip sedang dijalani</p>
-                  <p className="dash-statNote">month</p>
+                  <p className="dash-statSub">booking aktif</p>
+                  <p className="dash-statNote">confirmed / running</p>
                 </div>
                 <div className="dash-statIcon">↗</div>
               </div>
@@ -468,10 +515,10 @@ function Dashboard() {
             <div className="dash-statCard">
               <div className="dash-cardHead">
                 <div>
-                  <p className="dash-statLabel">Pending Project</p>
+                  <p className="dash-statLabel">Cancel Booking</p>
                   <p className="dash-statValue">{statusCounts.cancelled}</p>
-                  <p className="dash-statSub">trip dibatalkan</p>
-                  <p className="dash-statNote">On Discuss</p>
+                  <p className="dash-statSub">booking dibatalkan</p>
+                  <p className="dash-statNote">cancelled</p>
                 </div>
                 <div className="dash-statIcon">↗</div>
               </div>
@@ -714,8 +761,14 @@ function Dashboard() {
               <div className="dash-list">
                 {agendaUpcoming.length === 0 ? (
                   <div className="dash-emptyCard">
-                    <p className="dash-emptyTitle">Belum ada agenda</p>
-                    <p className="dash-emptyText">Booking trip untuk membuat agenda otomatis.</p>
+                    <p className="dash-emptyTitle">
+                      {bookingsLoading ? "Memuat data booking" : "Belum ada agenda"}
+                    </p>
+                    <p className="dash-emptyText">
+                      {bookingsLoading
+                        ? "Tunggu sebentar, data booking sedang diambil dari server."
+                        : "Booking trip untuk membuat agenda otomatis."}
+                    </p>
                   </div>
                 ) : (
                   agendaUpcoming.map((b) => (
@@ -747,7 +800,7 @@ function Dashboard() {
             {/* Team Collaboration / Riwayat */}
             <div className="dash-history">
               <div className="dash-historyHead">
-                <p className="dash-sectionTitle">Riwayat Trip Selesai</p>
+                <p className="dash-sectionTitle">Riwayat Booking</p>
                 <Link
                   to="/dashboard/riwayat"
                   className="dash-linkPill"
@@ -757,13 +810,19 @@ function Dashboard() {
               </div>
 
               <div className="dash-list">
-                {completedTripsNewest.length === 0 ? (
+                {historyBookings.length === 0 ? (
                   <div className="dash-emptyCard">
-                    <p className="dash-emptyTitle">Belum ada trip selesai</p>
-                    <p className="dash-emptyText">Trip akan masuk ke sini setelah tanggal keberangkatan lewat.</p>
+                    <p className="dash-emptyTitle">
+                      {bookingsLoading ? "Memuat data booking" : "Belum ada trip selesai"}
+                    </p>
+                    <p className="dash-emptyText">
+                      {bookingsLoading
+                        ? "Tunggu sebentar, data booking sedang diambil dari server."
+                        : "Booking akan masuk ke sini setelah data tersimpan."}
+                    </p>
                   </div>
                 ) : (
-                  completedTripsNewest.map((b) => {
+                  historyBookings.slice(0, 4).map((b) => {
                     const tripDate = getTripDate(b);
                     return (
                       <div key={b.id} className="dash-historyRow">
@@ -772,9 +831,11 @@ function Dashboard() {
                         </div>
                         <div className="dash-historyBody">
                           <p className="dash-historyTitle">{b.tripNama}</p>
-                          <p className="dash-historyDate">{tripDate ? formatDateId(tripDate) : "-"}</p>
+                          <p className="dash-historyDate">
+                            {tripDate ? formatDateId(tripDate) : "-"}
+                          </p>
                         </div>
-                        <span className="dash-historyStatus">Selesai</span>
+                        <span className="dash-historyStatus">{deriveTripStatus(b)}</span>
                       </div>
                     );
                   })
@@ -784,37 +845,49 @@ function Dashboard() {
               <p className="dash-historyFooter">riwayat</p>
             </div>
 
-            {/* Project Progress */}
+            {/* Cancel Booking */}
             <div className="dash-progress">
               <div className="dash-historyHead">
-                <p className="dash-sectionTitle">Project Progress</p>
+                <p className="dash-sectionTitle">Menu Cancel Booking</p>
               </div>
 
-              <div className="dash-progressGrid">
-                <div>
-                  <p className="dash-progressTitle">persen trip terselesaikan</p>
-                  <div className="dash-bars">
-                    <div className="dash-barMain" />
-                    <div className="dash-barSub" />
-                    <div className="dash-barSub" />
+              <p className="dash-remSub">
+                Booking yang masih pending atau terjalani bisa dibatalkan langsung dari sini.
+              </p>
+
+              <div className="dash-list">
+                {cancelableBookings.length === 0 ? (
+                  <div className="dash-emptyCard">
+                    <p className="dash-emptyTitle">Tidak ada booking yang bisa dibatalkan</p>
+                    <p className="dash-emptyText">Booking selesai atau sudah dibatalkan tidak tampil di menu ini.</p>
                   </div>
-                </div>
-                <div className="dash-progressPct">
-                  <p className="dash-progressPctValue">{progressPercent}%</p>
-                  <p className="dash-progressPctLabel">Project Ended</p>
-                </div>
-              </div>
-
-              <div className="dash-legend">
-                <span className="dash-legendItem">
-                  <span className="dash-dotCompleted" /> Completed ({statusCounts.ended})
-                </span>
-                <span className="dash-legendItem">
-                  <span className="dash-dotRunning" /> In Progress ({statusCounts.running})
-                </span>
-                <span className="dash-legendItem">
-                  <span className="dash-dotPending" /> Pending ({statusCounts.pending})
-                </span>
+                ) : (
+                  cancelableBookings.map((b) => {
+                    const tripDate = getTripDate(b);
+                    const status = deriveTripStatus(b);
+                    return (
+                      <div key={b.id} className="dash-cancelCard">
+                        <div className="dash-cancelRow">
+                          <div className="dash-cancelInfo">
+                            <p className="dash-cancelTitle">{b.tripNama}</p>
+                            <p className="dash-cancelMeta">
+                              {tripDate ? formatDateId(tripDate) : "-"} • {b.lokasi || "Yogyakarta"}
+                            </p>
+                          </div>
+                          <span className="dash-statusPill">{status}</span>
+                        </div>
+                        <button
+                          type="button"
+                          className="dash-cancelBtn"
+                          onClick={() => handleCancelBooking(b.id, b.tripNama)}
+                          disabled={cancellingBookingId === b.id}
+                        >
+                          {cancellingBookingId === b.id ? "Membatalkan..." : "Batalkan Booking"}
+                        </button>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </div>
 
@@ -832,7 +905,9 @@ function Dashboard() {
                 </div>
                 <div className="dash-followList">
                   {tripsFollowedNewest.length === 0 ? (
-                    <p className="dash-followEmpty">Belum ada trip yang diikuti.</p>
+                    <p className="dash-followEmpty">
+                      {bookingsLoading ? "Memuat data booking..." : "Belum ada trip yang diikuti."}
+                    </p>
                   ) : (
                     tripsFollowedNewest.map((b) => {
                       const tripDate = getTripDate(b);

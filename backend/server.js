@@ -111,8 +111,8 @@ app.post("/booking", (req, res) => {
       }
 
       const sqlInsertBooking = `
-        INSERT INTO open_trip_booking (trip_id, nama_lengkap, email, nomor_whatsapp, jumlah_peserta, total_bayar)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO open_trip_booking (trip_id, nama_lengkap, email, nomor_whatsapp, jumlah_peserta, total_bayar, status)
+        VALUES (?, ?, ?, ?, ?, ?, 'pending')
       `;
       const valuesBooking = [trip_id, nama_lengkap, email, nomor_whatsapp, jumlah_peserta, total_bayar];
 
@@ -142,6 +142,143 @@ app.post("/booking", (req, res) => {
               message: "Booking berhasil dibuat! Silakan lakukan konfirmasi pembayaran.",
               bookingId: result.insertId
             });
+          });
+        });
+      });
+    });
+  });
+});
+
+// ==========================================
+// ROUTE 4: AMBIL DATA BOOKING UNTUK DASHBOARD & RIWAYAT
+// ==========================================
+app.get("/bookings", (req, res) => {
+  const { email } = req.query;
+
+  let sqlBookings = `
+    SELECT
+      b.id,
+      b.trip_id AS tripId,
+      t.nama AS tripNama,
+      t.kategori,
+      t.durasi,
+      t.harga,
+      t.lokasi,
+      t.tanggal_keberangkatan AS tanggalKeberangkatan,
+      b.nama_lengkap AS namaLengkap,
+      b.email,
+      b.nomor_whatsapp AS nomorWa,
+      b.jumlah_peserta AS jumlahOrang,
+      b.total_bayar AS totalBayar,
+      COALESCE(b.status, 'pending') AS status,
+      b.tanggal_booking AS createdAt
+    FROM open_trip_booking b
+    INNER JOIN open_trip t ON t.id = b.trip_id
+  `;
+
+  const params = [];
+
+  if (email) {
+    sqlBookings += ` WHERE b.email = ? `;
+    params.push(email);
+  }
+
+  sqlBookings += ` ORDER BY b.tanggal_booking DESC `;
+
+  db.query(sqlBookings, params, (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Gagal mengambil data booking" });
+    }
+
+    res.json(results);
+  });
+});
+
+app.patch("/bookings/:id/cancel", (req, res) => {
+  const { id } = req.params;
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: "Email user wajib dikirim untuk pembatalan." });
+  }
+
+  db.beginTransaction((err) => {
+    if (err) return res.status(500).json({ message: "Gagal memulai transaksi pembatalan" });
+
+    const sqlCheckBooking = `
+      SELECT
+        b.id,
+        b.trip_id,
+        b.email,
+        COALESCE(b.status, 'pending') AS status,
+        b.jumlah_peserta,
+        t.kuota_tersisa
+      FROM open_trip_booking b
+      INNER JOIN open_trip t ON t.id = b.trip_id
+      WHERE b.id = ?
+    `;
+
+    db.query(sqlCheckBooking, [id], (err, rows) => {
+      if (err) {
+        return db.rollback(() => {
+          res.status(500).json({ message: "Gagal mengambil data booking" });
+        });
+      }
+
+      if (rows.length === 0) {
+        return db.rollback(() => {
+          res.status(404).json({ message: "Booking tidak ditemukan" });
+        });
+      }
+
+      const booking = rows[0];
+      const bookingEmail = String(booking.email || "").trim().toLowerCase();
+      const currentEmail = String(email || "").trim().toLowerCase();
+
+      if (bookingEmail && bookingEmail !== currentEmail) {
+        return db.rollback(() => {
+          res.status(403).json({ message: "Booking ini bukan milik akun yang login" });
+        });
+      }
+
+      const normalizedStatus = String(booking.status || "pending").toLowerCase();
+      if (normalizedStatus.includes("cancel")) {
+        return db.rollback(() => {
+          res.status(400).json({ message: "Booking sudah dibatalkan" });
+        });
+      }
+
+      if (normalizedStatus.includes("complete") || normalizedStatus.includes("selesai")) {
+        return db.rollback(() => {
+          res.status(400).json({ message: "Booking yang sudah selesai tidak bisa dibatalkan" });
+        });
+      }
+
+      const sqlUpdateBooking = `UPDATE open_trip_booking SET status = 'cancelled' WHERE id = ?`;
+      db.query(sqlUpdateBooking, [id], (err) => {
+        if (err) {
+          return db.rollback(() => {
+            res.status(500).json({ message: "Gagal membatalkan booking" });
+          });
+        }
+
+        const sqlRestoreQuota = `UPDATE open_trip SET kuota_tersisa = kuota_tersisa + ? WHERE id = ?`;
+        db.query(sqlRestoreQuota, [booking.jumlah_peserta, booking.trip_id], (err) => {
+          if (err) {
+            return db.rollback(() => {
+              res.status(500).json({ message: "Gagal mengembalikan kuota trip" });
+            });
+          }
+
+          db.commit((err) => {
+            if (err) {
+              return db.rollback(() => {
+                res.status(500).json({ message: "Gagal menyimpan pembatalan" });
+              });
+            }
+
+            res.json({ message: "Booking berhasil dibatalkan" });
           });
         });
       });
