@@ -154,5 +154,218 @@ exports.seed = async function(knex) {
       booking_id:1,
       user_id:1
     },
-  ]);
+  ])
+  
+   await knex('wisata').insert([
+    {
+      id: 'W01',
+      nama: 'Candi Prambanan',
+      lokasi: 'Sleman, DI Yogyakarta',
+      kategori: 'Sejarah & Budaya',
+      harga_mulai: 50000,
+      jam_operasional: '06:00 - 17:00',
+      gambar: 'https://www.worldhistory.org/img/r/p/1500x1500/9249.jpg.webp?v=1755704431',
+      rating: 4.9,
+      featured: true,
+      deskripsi: 'Candi Hindu terbesar di Indonesia.'
+    },
+    {
+      id: 'W02',
+      nama: 'Pantai Parangtritis',
+      lokasi: 'Bantul, DI Yogyakarta',
+      kategori: 'Wisata Alam',
+      harga_mulai: 15000,
+      jam_operasional: '24 Jam',
+      gambar: 'https://assets.telkomsel.com/public/2024-11/Pantai-Parangtritis-Surga-Tersembunyi-di-Yogyakarta.png',
+      rating: 4.8,
+      featured: true,
+      deskripsi: 'Pantai terkenal di pesisir selatan Yogyakarta.'
+    },
+    {
+      id: 'W03',
+      nama: 'Keraton Yogyakarta',
+      lokasi: 'Pusat Kota Yogyakarta',
+      kategori: 'Budaya & Sejarah',
+      harga_mulai: 15000,
+      jam_operasional: '08:00 - 14:00',
+      gambar: 'https://asset.kompas.com/crops/EIBd7igsHcB0GX68I6o9Y_57nOk=/0x0:1000x667/1200x800/data/photo/2022/06/28/62baefcf257f2.jpg',
+      rating: 4.9,
+      featured: false,
+      deskripsi: 'Istana resmi Kesultanan Yogyakarta.'
+    },
+    {
+      id: 'W04',
+      nama: 'Tebing Breksi',
+      lokasi: 'Sleman, DI Yogyakarta',
+      kategori: 'Alam & Spot Foto',
+      harga_mulai: 10000,
+      jam_operasional: '06:00 - 21:00',
+      gambar: 'https://assets.telkomsel.com/public/2024-11/tebing-breksi.jpg',
+      rating: 4.7,
+      featured: true,
+      deskripsi: 'Bekas tambang batu yang menjadi objek wisata.'
+    }
+  ])
+
+  await knex('tiket_wisata').insert([
+  {
+    id: 'P1',
+    wisata_id: 'W01',
+    nama: 'Tiket Masuk Weekday Dewasa',
+    harga: 50000
+  },
+  {
+    id: 'P2',
+    wisata_id: 'W01',
+    nama: 'Tiket Masuk Weekday Anak',
+    harga: 25000
+  },
+  {
+    id: 'P3',
+    wisata_id: 'W01',
+    nama: 'Tiket Masuk Weekend Dewasa',
+    harga: 75000
+  },
+  {
+    id: 'P4',
+    wisata_id: 'W01',
+    nama: 'Tiket Masuk Weekend Anak',
+    harga: 40000
+  },
+
+  {
+    id: 'PT1',
+    wisata_id: 'W02',
+    nama: 'Tiket Masuk Pantai',
+    harga: 15000
+  },
+  {
+    id: 'PT2',
+    wisata_id: 'W02',
+    nama: 'Tiket Camping',
+    harga: 35000
+  },
+  {
+    id: 'PT3',
+    wisata_id: 'W02',
+    nama: 'Tiket Sunset Spot',
+    harga: 25000
+  },
+
+  {
+    id: 'K1',
+    wisata_id: 'W03',
+    nama: 'Tiket Domestik Dewasa',
+    harga: 15000
+  },
+  {
+    id: 'K2',
+    wisata_id: 'W03',
+    nama: 'Tiket Domestik Anak',
+    harga: 10000
+  },
+  {
+    id: 'K3',
+    wisata_id: 'W03',
+    nama: 'Tiket Wisatawan Mancanegara',
+    harga: 50000
+  },
+
+  {
+    id: 'B1',
+    wisata_id: 'W04',
+    nama: 'Tiket Weekday Domestik',
+    harga: 10000
+  },
+  {
+    id: 'B2',
+    wisata_id: 'W04',
+    nama: 'Tiket Weekend Domestik',
+    harga: 15000
+  },
+  {
+    id: 'B3',
+    wisata_id: 'W04',
+    nama: 'Tiket Wisatawan Mancanegara',
+    harga: 30000
+  }
+]);
+
+await knex('fasilitas_wisata').insert([
+  {
+    wisata_id: 'W01',
+    nama: 'Sewa Sepeda Keliling',
+    harga: 'Rp 15.000 - Rp 30.000'
+  },
+  {
+    wisata_id: 'W01',
+    nama: 'Pemandu Wisata Lokal',
+    harga: 'Rp 75.000 - Rp 150.000'
+  },
+  {
+    wisata_id: 'W01',
+    nama: 'Area Parkir Mobil',
+    harga: 'Rp 5.000'
+  },
+  {
+    wisata_id: 'W01',
+    nama: 'Penyewaan Gazebo',
+    harga: 'Rp 50.000'
+  },
+
+  {
+    wisata_id: 'W02',
+    nama: 'Sewa ATV Pantai',
+    harga: 'Rp 50.000 - Rp 100.000'
+  },
+  {
+    wisata_id: 'W02',
+    nama: 'Sewa Ban Renang',
+    harga: 'Rp 10.000'
+  },
+  {
+    wisata_id: 'W02',
+    nama: 'Sewa Tenda Camping',
+    harga: 'Rp 75.000 - Rp 150.000'
+  },
+  {
+    wisata_id: 'W02',
+    nama: 'Penyewaan Perahu',
+    harga: 'Rp 25.000'
+  },
+
+  {
+    wisata_id: 'W03',
+    nama: 'Jasa Pemandu',
+    harga: 'Rp 50.000 - Rp 150.000'
+  },
+  {
+    wisata_id: 'W03',
+    nama: 'Penyewaan Helm Keselamatan',
+    harga: 'Rp 10.000'
+  },
+  {
+    wisata_id: 'W03',
+    nama: 'Sewa Senter',
+    harga: 'Rp 5.000'
+  },
+
+  {
+    wisata_id: 'W04',
+    nama: 'Sewa Jeep Jelajah',
+    harga: 'Rp 300.000 - Rp 600.000'
+  },
+  {
+    wisata_id: 'W04',
+    nama: 'Paket Foto Profesional',
+    harga: 'Rp 150.000'
+  },
+  {
+    wisata_id: 'W04',
+    nama: 'Sewa Kuda',
+    harga: 'Rp 50.000'
+  }
+]);
+
+
 };

@@ -87,14 +87,59 @@ exports.up = function(knex) {
     .references('id')
     .inTable('users')
     .onDelete('CASCADE');
-});
+})
+
+.createTable('wisata', (table) => {
+    table.string('id', 10).primary();
+    table.string('nama').notNullable();
+    table.string('lokasi').notNullable();
+    table.string('kategori').notNullable();
+    table.integer('harga_mulai').notNullable();
+    table.string('jam_operasional');
+    table.text('gambar');
+    table.text('deskripsi');
+    table.decimal('rating', 2, 1).defaultTo(4.5);
+    table.boolean('featured').defaultTo(false);
+
+    table.timestamps(true, true);
+  })
+  
+  .createTable('tiket_wisata', (table) => {
+    table.string('id', 20).primary();
+
+    table.string('wisata_id', 10)
+      .notNullable()
+      .references('id')
+      .inTable('wisata')
+      .onDelete('CASCADE');
+
+    table.string('nama').notNullable();
+    table.integer('harga').notNullable();
+
+    table.timestamps(true, true);
+  })
+  
+  .createTable('fasilitas_wisata', (table) => {
+    table.increments('id').primary();
+
+    table.string('wisata_id', 10)
+      .notNullable()
+      .references('id')
+      .inTable('wisata')
+      .onDelete('CASCADE');
+
+    table.string('nama').notNullable();
+    table.string('harga');
+
+    table.timestamps(true, true);
+  });
+
 };
 
 /**
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.down = function(knex) {
   // Proses menghapus tabel harus dibalik (hapus tabel anak dulu, baru tabel utama)
   // agar tidak melanggar aturan Foreign Key Constraint
   exports.down = function(knex) {
@@ -115,6 +160,9 @@ exports.down = function(knex) {
     .dropTableIfExists('open_trip')
 
     // tabel user
-    .dropTableIfExists('users');
-  }
+    .dropTableIfExists('users')
+    
+    .dropTableIfExists('tiket_wisata')
+    .dropTableIfExists('fasilitas_wisata')
+    .dropTableIfExists('wisata');
 };

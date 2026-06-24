@@ -1,129 +1,36 @@
-// ============================================================
-// TEMPLATE HALAMAN - Ganti isi sesuai halaman masing-masing
-// ============================================================
-
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-
-// =========================================================================
-// DATA MASTER
-// =========================================================================
-const koleksiWisata = {
-  "W01": {
-    nama: "Candi Prambanan",
-    lokasi: "Sleman, DI Yogyakarta",
-    kategori: "Sejarah & Budaya",
-    jamOperasional: "06:00 - 17:00",
-    gambar: "https://www.worldhistory.org/img/r/p/1500x1500/9249.jpg.webp?v=1755704431",
-    deskripsi: "Candi Prambanan adalah kompleks candi Hindu terbesar di Indonesia yang dibangun pada abad ke-9 pada masa Kerajaan Mataram Kuno. Candi ini didedikasikan untuk Trimurti Hindu, yaitu Dewa Brahma, Wisnu, dan Siwa, dengan Candi Siwa sebagai bangunan utama tertinggi. Prambanan terkenal karena arsitekturnya yang megah, relief kisah Ramayana, serta nilai sejarah dan budayanya yang tinggi. Karena keindahannya, Candi Prambanan ditetapkan sebagai Situs Warisan Dunia UNESCO dan menjadi salah satu destinasi wisata budaya paling populer di Indonesia.",
-    opsiTiket: [
-      { id: "p1", nama: "Tiket Masuk Weekday Dewasa", harga: 50000 },
-      { id: "p2", nama: "Tiket Masuk Weekday Anak", harga: 25000 },
-      { id: "p3", nama: "Tiket Masuk Weekend/Libur Dewasa", harga: 65000 },
-      { id: "p4", nama: "Tiket Masuk Weekend/Libur Anak", harga: 35000 },
-      { id: "p5", nama: "Pertunjukan Ramayana Ballet Reguler", harga: 165000 },
-    ],
-    fasilitasAktivitas: [
-      { nama: "Tiket Masuk Pelajar", harga: "Rp 25.000 – Rp 35.000" },
-      { nama: "Sewa Sepeda Keliling", harga: "Rp 15.000 – Rp 30.000" },
-      { nama: "Pemandu Wisata Lokal", harga: "Rp 75.000 – Rp 150.000" },
-      { nama: "Ramayana Ballet Spesial", harga: "Rp 385.000 – Rp 440.000" },
-      { nama: "Ramayana Ballet VIP", harga: "Rp 495.000 – Rp 550.000" },
-      { nama: "Parkir Mobil Khusus", harga: "Rp 10.000" },
-    ]
-  },
-  "W02": {
-    nama: "Pantai Parangtritis",
-    lokasi: "Bantul, DI Yogyakarta",
-    kategori: "Wisata Alam",
-    jamOperasional: "24 Jam",
-    gambar: "https://assets.telkomsel.com/public/2024-11/Pantai-Parangtritis-Surga-Tersembunyi-di-Yogyakarta.png",
-    deskripsi: "Pantai Parangtritis adalah salah satu pantai terkenal di Yogyakarta yang berada di pesisir selatan Kabupaten Bantul. Pantai ini terkenal dengan pasir hitam, ombak besar Samudra Hindia, serta pemandangan sunset yang indah. Selain menjadi tempat wisata favorit, Parangtritis juga memiliki nilai budaya dan legenda yang erat kaitannya dengan kisah Nyi Roro Kidul. Wisatawan biasanya datang untuk menikmati suasana pantai, naik ATV, berkuda, atau menikmati kuliner di sekitar pantai.",
-    opsiTiket: [
-      { id: "pt1", nama: "Tiket Masuk Pantai (Min)", harga: 10000 },
-      { id: "pt2", nama: "Tiket Masuk Pantai (Max)", harga: 15000 },
-      { id: "pt3", nama: "Kolam Renang Air Tawar", harga: 10000 },
-    ],
-    fasilitasAktivitas: [
-      { nama: "Sewa ATV Pantai", harga: "Rp 50.000 – Rp 100.000" },
-      { nama: "Naik Kuda Pantai", harga: "Rp 30.000 – Rp 50.000" },
-      { nama: "Sewa Jeep Gumuk Pasir", harga: "Rp 300.000 – Rp 550.000" },
-      { nama: "Sewa Tikar & Payung", harga: "Rp 25.000 / 2 jam" },
-      { nama: "Bilas / Mandi Air Bersih", harga: "Rp 1.000 – Rp 5.000" },
-      { nama: "Parkir Bus Pariwisata", harga: "Rp 20.000" },
-    ]
-  },
-  "W03": {
-    nama: "Keraton Yogyakarta",
-    lokasi: "Pusat Kota Yogyakarta",
-    kategori: "Budaya & Sejarah",
-    jamOperasional: "08:00 - 14:00",
-    gambar: "https://asset.kompas.com/crops/EIBd7igsHcB0GX68I6o9Y_57nOk=/0x0:1000x667/1200x800/data/photo/2022/06/28/62baefcf257f2.jpg",
-    deskripsi: "Keraton Ngayogyakarta Hadiningrat adalah istana resmi Kesultanan Yogyakarta yang menjadi pusat budaya Jawa dan tempat tinggal Sultan Yogyakarta. Dibangun pada tahun 1755 oleh Sultan Hamengkubuwono I, keraton ini memiliki arsitektur khas Jawa serta menyimpan berbagai koleksi sejarah, pusaka kerajaan, dan budaya tradisional. Selain sebagai simbol kebudayaan Jawa, Keraton Yogyakarta juga menjadi destinasi wisata sejarah yang terkenal dan sering mengadakan pertunjukan seni tradisional seperti tari Jawa dan gamelan.",
-    opsiTiket: [
-      { id: "k1", nama: "Tiket Domestik Dewasa", harga: 15000 },
-      { id: "k2", nama: "Tiket Domestik Anak", harga: 10000 },
-      { id: "k3", nama: "Mancanegara Dewasa", harga: 25000 },
-      { id: "k4", nama: "Mancanegara Anak", harga: 20000 },
-      { id: "k5", nama: "Museum Wahanarata Dewasa", harga: 20000 },
-    ],
-    fasilitasAktivitas: [
-      { nama: "Jasa Pemandu (Guide)", harga: "Rp 50.000 – Rp 150.000" },
-      { nama: "Foto Pakaian Adat", harga: "Rp 20.000 – Rp 50.000" },
-      { nama: "Sentra Souvenir", harga: "Mulai Rp 10.000" },
-      { nama: "Kuliner Tradisional", harga: "Rp 5.000 – Rp 50.000" },
-      { nama: "Parkir VIP", harga: "Rp 10.000" },
-      { nama: "Anak 0-2 Tahun", harga: "Gratis" },
-    ]
-  },
-  "W04": {
-    nama: "Tebing Breksi",
-    lokasi: "Sleman, DI Yogyakarta",
-    kategori: "Alam & Spot Foto",
-    jamOperasional: "06:00 - 21:00",
-    gambar: "https://assets.telkomsel.com/public/2024-11/tebing-breksi.jpg",
-    deskripsi: "Tebing Breksi adalah destinasi wisata alam di Yogyakarta yang terbentuk dari bekas area tambang batu breksi. Tempat ini terkenal karena tebing batu besar yang dipahat menjadi karya seni, pemandangan alam yang indah, serta spot sunset yang menarik. Selain menikmati panorama dari atas bukit, pengunjung juga dapat berfoto, naik jeep wisata, dan menikmati suasana amphitheater alami yang sering digunakan untuk pertunjukan dan acara budaya.",
-    opsiTiket: [
-      { id: "b1", nama: "Tiket Weekday Domestik", harga: 10000 },
-      { id: "b2", nama: "Tiket Weekend Domestik", harga: 15000 },
-      { id: "b3", nama: "Tiket Mancanegara", harga: 30000 },
-    ],
-    fasilitasAktivitas: [
-      { nama: "Sewa Jeep Jelajah", harga: "Rp 300.000 – Rp 600.000" },
-      { nama: "Akses Camping Area", harga: "Rp 15.000 – Rp 50.000" },
-      { nama: "Sewa Amphitheater", harga: "Mulai Rp 500.000+" },
-      { nama: "Spot Foto Prewedding", harga: "Rp 100.000 – Rp 500.000" },
-      { nama: "Parkir Bus Malam", harga: "Rp 25.000" },
-      { nama: "Jasa Fotografer", harga: "Rp 50.000" },
-    ]
-  }
-};
+import axios from "axios";
 
 function DetailWisata() {
   const { id } = useParams();
-
   const [selectedTiketId, setSelectedTiketId] = useState("");
   const [jumlahTiket, setJumlahTiket] = useState(1);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [id]);
-
-  const wisata = koleksiWisata[id] || koleksiWisata["W01"];
-
-  useEffect(() => {
-    if (wisata.opsiTiket && wisata.opsiTiket.length > 0) {
-      setSelectedTiketId(wisata.opsiTiket[0].id);
-    }
-    setJumlahTiket(1);
-  }, [id, wisata]);
-
+  const [wisata, setWisata] = useState(null);
   const handleKurang = () => setJumlahTiket((prev) => (prev > 1 ? prev - 1 : 1));
   const handleTambah = () => setJumlahTiket((prev) => prev + 1);
   const handleTiketChange = (e) => setSelectedTiketId(e.target.value);
-
-  const tiketPilihanInfo = wisata.opsiTiket.find(t => t.id === selectedTiketId) || wisata.opsiTiket[0];
+  const tiketPilihanInfo = wisata?.tiket?.find(t => t.id === selectedTiketId) || wisata?.tiket?.[0];
   const totalHarga = (tiketPilihanInfo?.harga || 0) * jumlahTiket;
+
+  useEffect(() => {
+  axios.get(`http://localhost:3001/wisata/${id}`)
+    .then((response) => {
+      const data = response.data.wisata;
+
+      setWisata(data);
+
+      if (data.tiket?.length > 0) {
+        setSelectedTiketId(data.tiket[0].id);
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+
+  setJumlahTiket(1);
+  window.scrollTo(0, 0);
+}, [id]);
 
   return (
     <div className="bg-[#fcfaf7] bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] min-h-screen pt-24 pb-24 selection:bg-[#c9a452] selection:text-white relative">
@@ -142,23 +49,23 @@ function DetailWisata() {
       {/* ─── IMMERSIVE HERO IMAGE ─── */}
       <div className="max-w-7xl mx-auto px-6 mb-16 relative z-10">
         <div className="relative h-[55vh] md:h-[65vh] rounded-[2.5rem] overflow-hidden shadow-[0_30px_60px_rgba(45,31,10,0.15)] ring-1 ring-[#c9a452]/20">
-          <img src={wisata.gambar} className="w-full h-full object-cover" alt={wisata.nama} />
+          <img src={wisata?.gambar} className="w-full h-full object-cover" alt={wisata?.nama} />
           <div className="absolute inset-0 bg-gradient-to-t from-[#1a1207] via-[#1a1207]/40 to-transparent"></div>
           
           <div className="absolute bottom-0 left-0 p-8 md:p-16 w-full">
             <div className="flex flex-wrap items-center gap-4 mb-4">
               <span className="bg-[#c9a452] text-[#1a1207] px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(201,164,82,0.4)]">
-                {wisata.kategori}
+                {wisata?.kategori}
               </span>
               <span className="text-white/90 text-sm flex items-center gap-2 font-light backdrop-blur-sm bg-white/10 px-4 py-1.5 rounded-full border border-white/20">
-                🕒 {wisata.jamOperasional}
+                🕒 {wisata?.jamOperasional}
               </span>
             </div>
             <h1 className="text-4xl md:text-6xl font-serif text-white font-bold mb-4 drop-shadow-xl leading-tight">
-              {wisata.nama}
+              {wisata?.nama}
             </h1>
             <p className="text-[#e8dcc4] text-sm md:text-base flex items-center gap-2 drop-shadow-md">
-              <span className="text-[#c9a452]">📍</span> {wisata.lokasi}
+              <span className="text-[#c9a452]">📍</span> {wisata?.lokasi}
             </p>
           </div>
         </div>
@@ -178,9 +85,9 @@ function DetailWisata() {
             </h2>
             <p className="text-gray-600 leading-relaxed text-justify font-light text-lg">
               <span className="float-left text-6xl font-serif text-[#c9a452] leading-none pr-3 pt-2">
-                {wisata.deskripsi.charAt(0)}
+                {wisata?.deskripsi?.charAt(0)}
               </span>
-              {wisata.deskripsi.slice(1)}
+              {wisata?.deskripsi?.slice(1)}
             </p>
           </section>
 
@@ -192,7 +99,7 @@ function DetailWisata() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {wisata.fasilitasAktivitas.map((item, index) => (
+              {wisata?.fasilitas?.map((item, index) => (
                 <div key={index} className="flex flex-col justify-center p-5 bg-white/60 backdrop-blur-sm rounded-2xl border border-[#c9a452]/20 hover:border-[#c9a452] transition-colors duration-300 group shadow-sm">
                   <span className="text-sm font-medium text-gray-700 mb-2">{item.nama}</span>
                   <span className="text-lg font-serif font-bold text-[#2d1f0a]">{item.harga}</span>
@@ -228,7 +135,7 @@ function DetailWisata() {
                       value={selectedTiketId}
                       onChange={handleTiketChange}
                     >
-                      {wisata.opsiTiket.map((t) => (
+                      {wisata?.tiket?.map((t) => (
                         <option key={t.id} value={t.id}>
                           {t.nama} — Rp {t.harga.toLocaleString("id-ID")}
                         </option>

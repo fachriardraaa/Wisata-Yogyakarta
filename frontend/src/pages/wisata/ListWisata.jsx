@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import axios from "axios";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 40 },
@@ -8,9 +9,19 @@ const fadeInUp = {
 };
 
 function ListWisata() {
+  const [wisataList, setWisataList] = useState([]);
+
   useEffect(() => {
+    axios.get("http://localhost:3001/wisata")
+      .then((response) => {
+        setWisataList(response.data.wisata);
+      })
+      .catch((error) => {
+        console.error("Error fetching wisata data:", error);
+      });
     window.scrollTo(0, 0);
   }, []);
+
 
   const wisataData = [
     { id: "W01", nama: "Candi Prambanan", lokasi: "Sleman, DIY", kategori: "Sejarah", harga: 50000, gambar: "https://www.worldhistory.org/img/r/p/1500x1500/9249.jpg.webp?v=1755704431" },
@@ -46,7 +57,7 @@ function ListWisata() {
       {/* ─── EDITORIAL GRID SECTION ─── */}
       <div className="max-w-7xl mx-auto px-6 py-24 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16">
-          {wisataData.map((item, index) => (
+          {wisataList.map((item, index) => (
             <motion.div 
               key={item.id}
               initial="hidden"
@@ -85,7 +96,7 @@ function ListWisata() {
                 <div className="flex justify-between items-end border-t border-gray-100 pt-5 mt-4">
                   <div>
                     <small className="text-gray-400 text-[10px] font-bold uppercase tracking-widest block mb-1">Mulai Dari</small>
-                    <span className="font-serif font-bold text-[#2d1f0a] text-xl">IDR {item.harga.toLocaleString('id-ID')}</span>
+                    <span className="font-serif font-bold text-[#2d1f0a] text-xl">IDR {(item.harga_mulai || 0).toLocaleString("id-ID")}</span>
                   </div>
                   <Link 
                     to={`/wisata/${item.id}`} 
