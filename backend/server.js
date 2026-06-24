@@ -198,6 +198,61 @@ app.post("/login", (req, res) => {
   });
 });
 
+// ==========================================
+// ROUTE 3: PROSES SIMPAN BOOKING TRIP
+// ==========================================
+
+app.get("/wisata", (req, res) => {
+  const sqlAllWisata = `
+    SELECT * FROM wisata
+  `;
+  db.query(sqlAllWisata, (err, results) => {
+    if (err) return res.status(500).json({ message: "Gagal memuat data wisata" });
+    res.json({ wisata: results });
+  });
+});
+
+app.get("/wisata/:id", (req, res) => {
+  const { id } = req.params;
+
+  const sqlWisata = `SELECT * FROM wisata WHERE id = ?`;
+  const sqlFasilitas = `SELECT * FROM fasilitas_wisata WHERE wisata_id = ?`;
+  const sqlTiket = `SELECT * FROM tiket_wisata WHERE wisata_id = ?`;
+
+  db.query(sqlWisata, [id], (err, results) => {
+    if (err) {
+      return res.status(500).json({ message: "Gagal memuat data wisata" });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Wisata tidak ditemukan" });
+    }
+
+    const wisata = results[0];
+
+    db.query(sqlFasilitas, [id], (err, fasilitasResults) => {
+      if (err) {
+        return res.status(500).json({ message: "Gagal memuat data fasilitas" });
+      }
+
+      wisata.fasilitas = fasilitasResults;
+
+      db.query(sqlTiket, [id], (err, tiketResults) => {
+        if (err) {
+          return res.status(500).json({ message: "Gagal memuat data tiket" });
+        }
+
+      wisata.tiket = tiketResults;
+
+        return res.json({ wisata });
+      });
+    });
+  });
+
+
+})
+
+
 app.listen(3001, () => {
   console.log("Server running on port 3001");
 });
