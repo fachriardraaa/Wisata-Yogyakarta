@@ -768,6 +768,64 @@
 	color: var(--dash-muted);
 }
 
+.dash-cancelCard {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	border-radius: 16px;
+	background: #fafaf9;
+	border: 1px solid var(--dash-border);
+	padding: 16px;
+}
+
+.dash-cancelRow {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.dash-cancelInfo {
+	min-width: 0;
+	flex: 1;
+}
+
+.dash-cancelTitle {
+	font-size: 14px;
+	font-weight: 900;
+	color: var(--dash-text);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.dash-cancelMeta {
+	margin-top: 4px;
+	font-size: 12px;
+	color: var(--dash-muted);
+}
+
+.dash-cancelBtn {
+	border: 0;
+	border-radius: 999px;
+	background: var(--dash-primary);
+	color: #ffffff;
+	padding: 10px 14px;
+	font-size: 12px;
+	font-weight: 900;
+	cursor: pointer;
+	align-self: flex-start;
+}
+
+.dash-cancelBtn:hover {
+	background: var(--dash-primary-2);
+}
+
+.dash-cancelBtn:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
 .dash-legend {
 	margin-top: 18px;
 	display: flex;

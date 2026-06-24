@@ -1,13 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import api from "../../services/api";
 import "../../style/User/riwayat.css";
-import { dataOpenTrip } from "../../services/data/OpenTrip";
-
-const BOOKING_STORAGE_KEY = "bookingHistory";
-
-const TRIP_BY_ID = new Map(
-  (Array.isArray(dataOpenTrip) ? dataOpenTrip : []).map((t) => [String(t.id), t])
-);
 
 function safeJsonParse(value, fallback) {
   try {
@@ -15,12 +9,6 @@ function safeJsonParse(value, fallback) {
   } catch {
     return fallback;
   }
-}
-
-function loadBookingHistory() {
-  const raw = localStorage.getItem(BOOKING_STORAGE_KEY);
-  const data = safeJsonParse(raw, []);
-  return Array.isArray(data) ? data : [];
 }
 
 function formatRupiah(value) {
@@ -59,19 +47,14 @@ function formatDateId(date) {
   }).format(date);
 }
 
-function getTripFromBooking(booking) {
-  const tripId = booking?.tripId != null ? String(booking.tripId) : null;
-  return tripId ? TRIP_BY_ID.get(tripId) : null;
-}
-
 function getTripDate(booking) {
-  const raw = booking?.tanggalKeberangkatan || getTripFromBooking(booking)?.tanggalKeberangkatan;
+  const raw = booking?.tanggalKeberangkatan;
   if (!raw) return null;
   return parseDateOnly(raw);
 }
 
 function getTripLokasi(booking) {
-  return booking?.lokasi || getTripFromBooking(booking)?.lokasi || "";
+  return booking?.lokasi || "";
 }
 
 function deriveTripStatus(booking) {
@@ -108,6 +91,7 @@ function RiwayatBooking() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [bookings, setBookings] = useState([]);
+  const [bookingsLoading, setBookingsLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState("all"); // all | done | progress | cancel
 
@@ -118,8 +102,42 @@ function RiwayatBooking() {
       return;
     }
     setUser(savedUser);
-    setBookings(loadBookingHistory());
   }, [navigate]);
+
+  useEffect(() => {
+    let isActive = true;
+
+    async function loadBookings() {
+      if (!user?.email) {
+        setBookings([]);
+        setBookingsLoading(false);
+        return;
+      }
+
+      setBookingsLoading(true);
+
+      try {
+        const response = await api.get("/bookings", {
+          params: { email: user.email },
+        });
+
+        if (!isActive) return;
+        setBookings(Array.isArray(response.data) ? response.data : []);
+      } catch (error) {
+        console.error("Gagal mengambil data booking:", error);
+        if (!isActive) return;
+        setBookings([]);
+      } finally {
+        if (isActive) setBookingsLoading(false);
+      }
+    }
+
+    loadBookings();
+
+    return () => {
+      isActive = false;
+    };
+  }, [user?.email]);
 
   const userBookings = useMemo(() => {
     if (!user?.email) return bookings;
@@ -140,7 +158,7 @@ function RiwayatBooking() {
     const q = search.trim().toLowerCase();
     return sortedBookings
       .map((b) => {
-        const trip = getTripFromBooking(b);
+        const trip = b;
         const status = deriveTripStatus(b);
         const kind = statusKind(status);
         const tripDate = getTripDate(b);
@@ -330,7 +348,11 @@ function RiwayatBooking() {
               <div className="riwayat-tableMeta">Total: {rows.length} item</div>
             </div>
 
-            {rows.length === 0 ? (
+            {bookingsLoading ? (
+              <div className="riwayat-emptyWrap">
+                <div className="riwayat-emptyNotice">Memuat data booking dari server...</div>
+              </div>
+            ) : rows.length === 0 ? (
               <div className="riwayat-emptyWrap">
                 <div className="riwayat-emptyNotice">Tidak ada data yang cocok.</div>
               </div>
