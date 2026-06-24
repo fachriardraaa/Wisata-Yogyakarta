@@ -61,3 +61,4 @@ proyek-hiling-semata/
     Jalankan aplikasi frontend React Anda:
 
     npm run dev
+    kontol kita
