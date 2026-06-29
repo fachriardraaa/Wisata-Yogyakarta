@@ -388,7 +388,40 @@ app.get("/wisata/:id", (req, res) => {
 
 
 })
+// ==========================================
+// ROUTE ABOUT US: DATA TIM KAMI
+// ==========================================
+app.get("/tim", (req, res) => {
+  const sqlTim = `SELECT * FROM tim_kami`;
+  db.query(sqlTim, (err, results) => {
+    if (err) {
+      console.error("Gagal mengambil data tim:", err);
+      return res.status(500).json({ message: "Gagal memuat data tim" });
+    }
+    res.json(results);
+  });
+});
 
+// ==========================================
+// ROUTE BARU: TERIMA PESAN KONTAK
+// ==========================================
+app.post("/kontak", (req, res) => {
+  const { nama, email, pesan } = req.body;
+
+  // Validasi sederhana: pastikan semua kolom diisi
+  if (!nama || !email || !pesan) {
+    return res.status(400).json({ message: "Nama, email, dan pesan wajib diisi!" });
+  }
+
+  const sqlInsert = `INSERT INTO pesan_kontak (nama, email, pesan) VALUES (?, ?, ?)`;
+  db.query(sqlInsert, [nama, email, pesan], (err, result) => {
+    if (err) {
+      console.error("Gagal menyimpan pesan kontak:", err);
+      return res.status(500).json({ message: "Terjadi kesalahan server, pesan gagal dikirim." });
+    }
+    res.status(201).json({ message: "Pesan berhasil dikirim! Terima kasih." });
+  });
+});
 
 app.listen(3001, () => {
   console.log("Server running on port 3001");

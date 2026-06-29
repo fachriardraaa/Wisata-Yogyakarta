@@ -1,6 +1,7 @@
 // src/pages/landing/Contact.jsx
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import axios from 'axios'; // IMPORT AXIOS
 
 // IMPORT CSS KHUSUS CONTACT
 import '../../style/home-style/contact.css';
@@ -24,6 +25,8 @@ function Contact() {
 
   // STATE UNTUK NOTIFIKASI SUKSES / CONDITIONAL RENDERING
   const [isSubmitted, setIsSubmitted] = useState(false);
+  // STATE UNTUK LOADING SAAT MENGIRIM
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -32,12 +35,24 @@ function Contact() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.nama && formData.email && formData.pesan) {
-      setIsSubmitted(true);
-      // Reset form setelah submit
-      setFormData({ nama: '', email: '', pesan: '' });
+      setIsSubmitting(true);
+      
+      try {
+        // MENGIRIM DATA KE BACKEND
+        await axios.post('http://localhost:3001/kontak', formData);
+        
+        // JIKA BERHASIL: Tampilkan UI sukses dan reset form
+        setIsSubmitted(true);
+        setFormData({ nama: '', email: '', pesan: '' });
+      } catch (error) {
+        console.error("Gagal mengirim pesan:", error);
+        alert("Maaf, terjadi kesalahan saat mengirim pesan. Pastikan server backend berjalan.");
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -124,6 +139,7 @@ function Contact() {
                     className="form-input-field" 
                     placeholder="Masukkan nama Anda"
                     required 
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div>
@@ -136,6 +152,7 @@ function Contact() {
                     className="form-input-field" 
                     placeholder="nama@email.com"
                     required 
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div>
@@ -148,9 +165,16 @@ function Contact() {
                     className="form-input-field resize-none" 
                     placeholder="Tuliskan pertanyaan atau rencana perjalanan Anda..."
                     required
+                    disabled={isSubmitting}
                   ></textarea>
                 </div>
-                <button type="submit" className="btn-form-submit">Kirim Pesan →</button>
+                <button 
+                  type="submit" 
+                  className={`btn-form-submit ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Mengirim...' : 'Kirim Pesan →'}
+                </button>
               </form>
             )}
           </motion.div>
